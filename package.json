@@ -1,0 +1,42 @@
+{
+  "name": "conqur",
+  "version": "0.1.1",
+  "description": "Framework for creating Processes with Erlang/Elixir message passing semantics",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "jest",
+    "compile": "tsc",
+    "clean": "rm -rf build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mangr3n/conqur.git"
+  },
+  "keywords": [
+    "elixir",
+    "erlang",
+    "actor",
+    "process",
+    "async"
+  ],
+  "author": "David Boyer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mangr3n/crkt/issues"
+  },
+  "homepage": "https://github.com/mangr3n/crkt#readme",
+  "dependencies": {
+    "@babel/polyfill": "^7.2.5",
+    "nanoutils": "^0.1.2",
+    "setasap": "^2.0.1",
+    "setimmediate": "^1.0.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-typescript": "^7.1.0",
+    "jest": "^24.8.0",
+    "typescript": "^3.3.1"
+  }
+}
