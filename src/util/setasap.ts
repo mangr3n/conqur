@@ -1,4 +1,6 @@
 declare var self: any;
+
+declare var require: (string) => any;
 // Schedules work off the stack
 // It will push to the microtask queue (processed first after stack)
 // Or if a certain amount of time has passed, it will push to the event loop

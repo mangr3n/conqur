@@ -1,4 +1,5 @@
 import { setAsap } from "./util/setasap";
+import { isNil } from './util/index';
 
 const conqurSystem = (self as any)._conqurInners = (self as any)._conqurInners || {
   processes: {},
