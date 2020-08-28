@@ -1,4 +1,4 @@
-import { setAsap } from "./setasap";
+import { setAsap } from "./util/setasap";
 
 const conqurSystem = (self as any)._conqurInners = (self as any)._conqurInners || {
   processes: {},
@@ -11,22 +11,17 @@ const conqurSystem = (self as any)._conqurInners = (self as any)._conqurInners |
   midCounter: 0
 };
 
-const isNil = (v) => {
-  if (v === undefined) return true;
-  if (v === null) return true;
-  return false;
-}
 
 export interface Process {
   name?: string;
   self: () => number;
   handleCall?: (any) => Promise<any>;
   handleCast: (any) => void;
-}
+};
 
 const registerProcess = (pid: number, process:Process) => {
   conqurSystem.processes[pid] = process;
-}
+};
 
 const isProcess = (pid: number) => {
   return !isNil(conqurSystem.processes[pid]);
@@ -55,7 +50,7 @@ const registerError = (errorPacket) => {
     conqurSystem.errors.byProcessId[pid] = [];
   }
   conqurSystem.errors.byProcessId[pid].push(errorPacket);
-}
+};
 
 const processEventQueue = () => {
   const {pid,message, mid} = getNextMessage();
@@ -76,7 +71,7 @@ const getProcess = (pid) => {
     throw new Error(`Cannot get a process that does not exist: ${pid}`);
   }
   return conqurSystem.processes[pid];
-}
+};
 
 
 /**
@@ -107,10 +102,10 @@ export const cast = (pid, message: any) => {
   queueMessage(pid,mid,message);
   setAsap(processEventQueue);
   return mid;
-}
+};
 
 export async function call(pid, message) {
   if (!isProcess(pid)) throw new Error(`Cannot call a non-existent process: ${pid}`);
   const process = getProcess(pid);
-  return await process.call(message);
+  return await process.handleCall(message);
 };
