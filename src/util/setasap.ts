@@ -1,5 +1,3 @@
-declare var self: any;
-
 declare var require: (string) => any;
 // Schedules work off the stack
 // It will push to the microtask queue (processed first after stack)
@@ -7,9 +5,16 @@ declare var require: (string) => any;
 // This allows eventhandlers and renderering to fire.
 require('setimmediate');
 
+
+const self = require('./self').getSelf();
+
+
+
 const queueMicrotask = (() => {
   if (self.queueMicrotask !== undefined) {
     return self.queueMicrotask;
+  } else if (self.process.nextTick !== undefined) {
+    return self.process.nextTick;
   } else {
     const unusedNodes = [];
     return (callback) => {

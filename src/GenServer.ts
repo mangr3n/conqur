@@ -1,17 +1,19 @@
 import { isNil } from "./util";
 import { create } from './index';
+import { ProcessAccessor } from "./types";
 
-type ProcessID = number;
+interface State {
+  [index: string]: any;
+}
 
 interface Message {
   [index: string]: any;
   type: string;
+  done: () => void;
 };
 
-type ProcessAccessor = () => ProcessID;
-
-type CastHandler = (self: ProcessAccessor, state: any, msg: Message) => any;
-type CallHandler = (self: ProcessAccessor, state: any, msg: Message) => Promise<any>;
+type CastHandler = (self: ProcessAccessor, state: State, msg: Message) => any;
+type CallHandler = (self: ProcessAccessor, state: State, msg: Message) => any;
 
 interface CastHandlerMap {
   [index: string]: CastHandler
@@ -35,13 +37,13 @@ export const GenServer = ({name, castHandlers, callHandlers, initialState}:GenSe
   let me = null;
   const self = () => me;
 
-  async function handleCall(msg:Message) {
+  function handleCall(msg:Message) {
     const {type} = msg
     if (isNil(callHandlers[type])) {
       throw new Error(`Unknown call message type '${type}'`);
     } else {
       const handler = callHandlers[type];
-      return await handler(self,state,msg);
+      return handler(self,state,msg);
     }
   }
 
@@ -55,10 +57,12 @@ export const GenServer = ({name, castHandlers, callHandlers, initialState}:GenSe
       } else {
         const handler = castHandlers[type];
         state = handler(self, state, msg);
+        if (msg.done) msg.done();
       }
     },
     handleCall
   };
   me = create(processDef);
+  return me;
 };
 

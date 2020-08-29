@@ -1,5 +1,15 @@
 import { setAsap } from "./util/setasap";
 import { isNil } from './util/index';
+import { getSelf } from './util/self';
+import { Process, ProcessID } from './types';
+
+declare var process;
+declare var window;
+declare var global;
+
+const self = getSelf();
+
+if (isNil(self)) throw new Error('Cannot start system, cannot resolve self');
 
 const conqurSystem = (self as any)._conqurInners = (self as any)._conqurInners || {
   processes: {},
@@ -12,24 +22,20 @@ const conqurSystem = (self as any)._conqurInners = (self as any)._conqurInners |
   midCounter: 0
 };
 
-
-export interface Process {
-  name?: string;
-  self: () => number;
-  handleCall?: (any) => Promise<any>;
-  handleCast: (any) => void;
-};
-
-const registerProcess = (pid: number, process:Process) => {
+const registerProcess = (pid: ProcessID, process: Process) => {
   conqurSystem.processes[pid] = process;
 };
 
-const isProcess = (pid: number) => {
+const isProcess = (pid: ProcessID) => {
   return !isNil(conqurSystem.processes[pid]);
 }
 
-const queueMessage = (pid, mid, message) => {
+const queueMessage = (pid: ProcessID, mid, message) => {
   conqurSystem.messageQueue.push({pid,message,mid});
+};
+
+const hasMessages = () => {
+  return conqurSystem.messageQueueIndex < conqurSystem.messageQueue.length - 1;
 };
 
 const getNextMessage = () => {
@@ -54,6 +60,7 @@ const registerError = (errorPacket) => {
 };
 
 const processEventQueue = () => {
+  if (!hasMessages()) return;
   const {pid,message, mid} = getNextMessage();
 
   if (!isProcess(pid)) {
@@ -64,6 +71,7 @@ const processEventQueue = () => {
     process.handleCast(message);
   } catch (error) {
     registerError({message,mid,pid,error});
+    throw error;
   }
 };
 
@@ -105,8 +113,8 @@ export const cast = (pid, message: any) => {
   return mid;
 };
 
-export async function call(pid, message) {
+export function call(pid, message) {
   if (!isProcess(pid)) throw new Error(`Cannot call a non-existent process: ${pid}`);
   const process = getProcess(pid);
-  return await process.handleCall(message);
+  return process.handleCall(message);
 };

@@ -1,0 +1,1 @@
+export const getSelf = () => globalThis;
