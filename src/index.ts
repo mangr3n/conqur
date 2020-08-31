@@ -3,10 +3,7 @@ import { isNil } from './util/index';
 import { getSelf } from './util/self';
 import { Process, ProcessID } from './types';
 
-declare var process;
-declare var window;
-declare var global;
-
+export { Process, ProcessID, ProcessAccessor } from './types';
 
 const self = getSelf();
 
@@ -120,4 +117,4 @@ export function call(pid, message) {
 };
 
 declare var require;
-export const GenServer = require('./GenServer');
+export const {GenServer} = require('./GenServer');

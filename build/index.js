@@ -107,4 +107,4 @@ function call(pid, message) {
 }
 exports.call = call;
 ;
-exports.GenServer = require('./GenServer');
+exports.GenServer = require('./GenServer').GenServer;
