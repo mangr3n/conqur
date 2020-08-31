@@ -34,7 +34,7 @@ var getNextMessage = function () {
     conqurSystem.messageQueueIndex++;
     if (conqurSystem.messageQueueIndex == conqurSystem.messageQueue.length) {
         conqurSystem.messageQueue = [];
-        conqurSystem.messageQueueIdx = 0;
+        conqurSystem.messageQueueIndex = 0;
     }
     else {
         setasap_1.setAsap(processEventQueue);
@@ -59,7 +59,6 @@ var processEventQueue = function () {
     var process = getProcess(pid);
     try {
         process.handleCast(message);
-        setasap_1.setAsap(processEventQueue);
     }
     catch (error) {
         registerError({ message: message, mid: mid, pid: pid, error: error });
