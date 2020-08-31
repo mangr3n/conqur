@@ -7,6 +7,7 @@ declare var process;
 declare var window;
 declare var global;
 
+
 const self = getSelf();
 
 if (isNil(self)) throw new Error('Cannot start system, cannot resolve self');
@@ -117,3 +118,6 @@ export function call(pid, message) {
   const process = getProcess(pid);
   return process.handleCall(message);
 };
+
+declare var require;
+export const GenServer = require('./GenServer');

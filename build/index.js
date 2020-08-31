@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.call = exports.cast = exports.destroy = exports.create = void 0;
+exports.GenServer = exports.call = exports.cast = exports.destroy = exports.create = void 0;
 var setasap_1 = require("./util/setasap");
 var index_1 = require("./util/index");
 var self_1 = require("./util/self");
@@ -107,3 +107,4 @@ function call(pid, message) {
 }
 exports.call = call;
 ;
+exports.GenServer = require('./GenServer');
