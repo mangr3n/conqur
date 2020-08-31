@@ -26,6 +26,9 @@ var isProcess = function (pid) {
 var queueMessage = function (pid, mid, message) {
     conqurSystem.messageQueue.push({ pid: pid, message: message, mid: mid });
 };
+var hasMessages = function () {
+    return conqurSystem.messageQueueIndex < conqurSystem.messageQueue.length;
+};
 var getNextMessage = function () {
     var message = conqurSystem.messageQueue[conqurSystem.messageQueueIndex];
     conqurSystem.messageQueueIndex++;
@@ -47,6 +50,8 @@ var registerError = function (errorPacket) {
     conqurSystem.errors.byProcessId[pid].push(errorPacket);
 };
 var processEventQueue = function () {
+    if (!hasMessages())
+        return;
     var _a = getNextMessage(), pid = _a.pid, message = _a.message, mid = _a.mid;
     if (!isProcess(pid)) {
         throw new Error("Cannot handle a queued message for a non-existent process: " + pid);
@@ -54,9 +59,11 @@ var processEventQueue = function () {
     var process = getProcess(pid);
     try {
         process.handleCast(message);
+        setasap_1.setAsap(processEventQueue);
     }
     catch (error) {
         registerError({ message: message, mid: mid, pid: pid, error: error });
+        throw error;
     }
 };
 var getProcess = function (pid) {

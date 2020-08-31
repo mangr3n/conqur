@@ -35,7 +35,7 @@ const queueMessage = (pid: ProcessID, mid, message) => {
 };
 
 const hasMessages = () => {
-  return conqurSystem.messageQueueIndex < conqurSystem.messageQueue.length - 1;
+  return conqurSystem.messageQueueIndex < conqurSystem.messageQueue.length;
 };
 
 const getNextMessage = () => {
@@ -62,13 +62,13 @@ const registerError = (errorPacket) => {
 const processEventQueue = () => {
   if (!hasMessages()) return;
   const {pid,message, mid} = getNextMessage();
-
   if (!isProcess(pid)) {
     throw new Error(`Cannot handle a queued message for a non-existent process: ${pid}`);
   }
   const process = getProcess(pid);
   try {
     process.handleCast(message);
+    setAsap(processEventQueue);
   } catch (error) {
     registerError({message,mid,pid,error});
     throw error;

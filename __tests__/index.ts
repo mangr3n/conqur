@@ -1,5 +1,6 @@
 import { doesNotMatch } from "assert";
 import { GenServer } from '../src/genserver';
+import { setAsap } from "../src/util/setasap";
 
 declare var require;
 const { create, cast, call, destroy } = require('../src/index');
@@ -34,7 +35,7 @@ test('expect call to invoke handleCall', () => {
   expect(call(processId,1)).toBe(1);
 });
 
-test('expect a GenServer to maintain internal state', () => {
+test('expect a GenServer to maintain internal state', (done) => {
   const processId = GenServer({
     name: 'GenServerTest',
     initialState: { count: 0 },
@@ -68,9 +69,8 @@ test('expect a GenServer to maintain internal state', () => {
   expect(call(processId, {type: 'dec'})).toBe(0);
 
   cast(processId,{type: 'inc', done: () => {
+    console.log('inc/done');
     expect(call(processId, {type: 'count'})).toBe(1);
-  }});
-  cast(processId, {type: 'dec', done: () => {
-    expect(call(processId, {type: 'count'})).toBe(0);
+    setAsap(() => done());
   }});
 });
