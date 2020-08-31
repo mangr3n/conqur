@@ -69,8 +69,10 @@ test('expect a GenServer to maintain internal state', (done) => {
   expect(call(processId, {type: 'dec'})).toBe(0);
 
   cast(processId,{type: 'inc', done: () => {
-    console.log('inc/done');
     expect(call(processId, {type: 'count'})).toBe(1);
-    setAsap(() => done());
+  }});
+  cast(processId, {type: 'dec', done: () => {
+    expect(call(processId, {type: 'count'})).toBe(0);
+    done();
   }});
 });

@@ -43,7 +43,7 @@ const getNextMessage = () => {
   conqurSystem.messageQueueIndex++;
   if (conqurSystem.messageQueueIndex == conqurSystem.messageQueue.length) {
     conqurSystem.messageQueue = [];
-    conqurSystem.messageQueueIdx = 0;
+    conqurSystem.messageQueueIndex = 0;
   } else {
     setAsap(processEventQueue)
   }
@@ -68,7 +68,6 @@ const processEventQueue = () => {
   const process = getProcess(pid);
   try {
     process.handleCast(message);
-    setAsap(processEventQueue);
   } catch (error) {
     registerError({message,mid,pid,error});
     throw error;
