@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GenServer = exports.call = exports.cast = exports.destroy = exports.create = void 0;
+exports.call = exports.cast = exports.destroy = exports.create = void 0;
 var setasap_1 = require("./util/setasap");
 var index_1 = require("./util/index");
 var self_1 = require("./util/self");
+var GenServer_1 = require("./GenServer");
+Object.defineProperty(exports, "GenServer", { enumerable: true, get: function () { return GenServer_1.GenServer; } });
 var self = self_1.getSelf();
 if (index_1.isNil(self))
     throw new Error('Cannot start system, cannot resolve self');
@@ -107,4 +109,3 @@ function call(pid, message) {
 }
 exports.call = call;
 ;
-exports.GenServer = require('./GenServer').GenServer;
