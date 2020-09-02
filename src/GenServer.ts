@@ -1,5 +1,5 @@
 import { isNil } from "./util";
-import { create } from './index';
+import {create } from './core';
 import { ProcessAccessor } from "./types";
 
 interface State {
