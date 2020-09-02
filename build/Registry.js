@@ -16,6 +16,11 @@ var _process = GenServer_1.GenServer({
         },
     },
     callHandlers: {
+        create: function (self, state, msg) {
+            var process = msg.process, name = msg.name;
+            state.processMap[name] = process;
+            return state;
+        },
         lookup: function (self, state, msg) {
             var name = msg.name;
             return state.processMap[name];
@@ -24,7 +29,7 @@ var _process = GenServer_1.GenServer({
 });
 exports.Registry = {
     create: function (process, name) {
-        core_1.cast(_process, { type: 'create', process: process, name: name });
+        return core_1.call(_process, { type: 'create', process: process, name: name });
     },
     lookup: function (name) {
         return core_1.call(_process, { type: 'lookup', name: name });

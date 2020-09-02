@@ -22,9 +22,9 @@
   "author": "David Boyer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mangr3n/crkt/issues"
+    "url": "https://github.com/mangr3n/conqur/issues"
   },
-  "homepage": "https://github.com/mangr3n/crkt#readme",
+  "homepage": "https://github.com/mangr3n/conqur#readme",
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "nanoutils": "^0.1.2",

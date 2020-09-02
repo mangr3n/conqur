@@ -26,15 +26,20 @@ getBus = (name) => {
         },
         processQueue: (self, state, _msg) => {
           if (state.handleQueue.length > 0) {
-            const handleEntry = state.handleQueue.pop();
+            const handleEntry = state.handleQueue.shift();
             const { event, handler } = handleEntry;
             const { id, options } = handler;
             const _handler = handler.handler;
-            _handler(event);
-            if (options.once) {
-              call(self(), { type: 'removeHandler', id });
+            if (!_handler(event)) {
+              state.handleQueue.push(handleEntry);
+              if (state.handleQueue.length > 1) {
+                cast(self(), { type: 'processQueue' });
+              }
+            } else {
+              if (options.once) {
+                call(self(), { type: 'removeHandler', id });
+              }
             }
-            cast(self(), { type: 'processQueue' });
           }
           return state;
         }

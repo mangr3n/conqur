@@ -17,8 +17,8 @@ var Registry_1 = require("./Registry");
 var GenServer_1 = require("./GenServer");
 var getBus = null;
 getBus = function (name) {
-    var _registryName = function () { return "Bus[" + name + "]"; };
-    if (Registry_1.Registry.lookup(_registryName()) == null) {
+    var _registryName = "Bus[" + name + "]";
+    if (Registry_1.Registry.lookup(_registryName) == null) {
         var bus = GenServer_1.GenServer({
             initialState: {
                 _handlerId: 0,
@@ -26,7 +26,7 @@ getBus = function (name) {
                 handlers: {},
                 handleQueue: []
             },
-            name: "Bus[" + name + "]",
+            name: _registryName,
             castHandlers: {
                 init: function (self, state, msg) {
                     var handlers = msg.handlers;
@@ -36,32 +36,23 @@ getBus = function (name) {
                     }
                     return state;
                 },
-                sendEvent: function (self, state, msg) {
-                    var event = msg.event;
-                    var type = event.type;
-                    if (!state.handlers.hasOwnProperty(type)) {
-                        console.log("Bus[" + name + "] no handlers for " + type, { msg: msg, state: state });
-                        return state;
-                    }
-                    var handlers = state.handlers[type];
-                    for (var idx = 0; idx < handlers.length; idx++) {
-                        var handlerEntry = handlers[idx];
-                        state.handleQueue.push({ handler: handlerEntry, msg: msg });
-                    }
-                    core_1.cast(self(), { type: 'processQueue' });
-                    return state;
-                },
                 processQueue: function (self, state, _msg) {
                     if (state.handleQueue.length > 0) {
-                        var handleEntry = state.handleQueue.pop();
-                        var msg = handleEntry.msg, handler = handleEntry.handler;
+                        var handleEntry = state.handleQueue.shift();
+                        var event_2 = handleEntry.event, handler = handleEntry.handler;
                         var id = handler.id, options = handler.options;
                         var _handler = handler.handler;
-                        _handler(msg);
-                        if (options.once) {
-                            core_1.call(self(), { type: 'removeHandler', id: id });
+                        if (!_handler(event_2)) {
+                            state.handleQueue.push(handleEntry);
+                            if (state.handleQueue.length > 1) {
+                                core_1.cast(self(), { type: 'processQueue' });
+                            }
                         }
-                        core_1.cast(self(), { type: 'processQueue' });
+                        else {
+                            if (options.once) {
+                                core_1.call(self(), { type: 'removeHandler', id: id });
+                            }
+                        }
                     }
                     return state;
                 }
@@ -79,6 +70,22 @@ getBus = function (name) {
                     state.handlers[event].push(handlerEntry);
                     return id;
                 },
+                sendEvent: function (self, state, msg) {
+                    var event = msg.event;
+                    var type = event.type;
+                    if (!state.handlers.hasOwnProperty(type)) {
+                        console.log(_registryName + " has no handlers for '" + type + "'");
+                    }
+                    else {
+                        var handlers = state.handlers[type];
+                        for (var idx = 0; idx < handlers.length; idx++) {
+                            var handlerEntry = handlers[idx];
+                            state.handleQueue.push({ handler: handlerEntry, event: event });
+                        }
+                    }
+                    core_1.cast(self(), { type: 'processQueue' });
+                    return state;
+                },
                 removeHandler: function (self, state, msg) {
                     var id = msg.id;
                     var event = state.idMap[id].event;
@@ -95,26 +102,26 @@ getBus = function (name) {
                 }
             }
         });
-        Registry_1.Registry.create(bus, _registryName());
+        Registry_1.Registry.create(bus, _registryName);
     }
     return {
         getBus: getBus,
         initialize: function (handlers) {
-            core_1.cast(Registry_1.Registry.lookup(_registryName()), { type: 'init', handlers: handlers });
+            core_1.cast(Registry_1.Registry.lookup(_registryName), { type: 'init', handlers: handlers });
         },
         sendEvent: function (event) {
-            core_1.cast(Registry_1.Registry.lookup(_registryName()), { type: 'sendEvent', event: event });
+            core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'sendEvent', event: event });
             return;
         },
         handle: function (event, handler, options) {
             if (options === void 0) { options = {}; }
-            return core_1.call(Registry_1.Registry.lookup(_registryName()), { type: 'registerHandler', event: event, handler: handler, options: options });
+            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'registerHandler', event: event, handler: handler, options: options });
         },
         handleOnce: function (event, handler) {
-            return core_1.call(Registry_1.Registry.lookup(_registryName()), { type: 'registerHandler', event: event, handler: handler, options: { once: true } });
+            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'registerHandler', event: event, handler: handler, options: { once: true } });
         },
         unhandle: function (handlerId) {
-            return core_1.call(Registry_1.Registry.lookup(_registryName()), { type: 'removeHandler', id: handlerId });
+            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'removeHandler', id: handlerId });
         }
     };
 };
