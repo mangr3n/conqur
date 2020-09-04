@@ -2,6 +2,7 @@ import { call, cast } from './core';
 import { GenServer } from './GenServer';
 import { Bus } from './Bus';
 import { Registry } from './Registry';
+import { isNil } from './util';
 
 const correctIndex = (index) => isNaN(parseInt(index)) ? index : parseInt(index);
 
@@ -53,8 +54,12 @@ const getState = (scope, busName) => {
           },
           get: (self, state, msg) => {
             const { name } = msg;
-            const path = name.split('.');
-            return getNestedValue(path, state);
+            if (isNil(name) || undefined === name || name == '' || name == '.') {
+              return getNestedValue([],state);
+            } else {
+              const path = name.split('.');
+              return getNestedValue(path, state);
+            }
           }
         }
       }),
@@ -67,7 +72,7 @@ const getState = (scope, busName) => {
     set: (name, value) => {
       call(Registry.lookup(registryName), { type: 'set', name, value });
     },
-    get: (name) => {
+    get: (name:string = null) => {
       return call(Registry.lookup(registryName), { type: 'get', name });
     }
   };

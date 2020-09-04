@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenServer = void 0;
 var util_1 = require("./util");
-var conqur = require("./core");
-console.log('GenServer: ', { conqur: conqur });
+var core_1 = require("./core");
 ;
 exports.GenServer = function (_a) {
     var name = _a.name, castHandlers = _a.castHandlers, callHandlers = _a.callHandlers, initialState = _a.initialState;
@@ -37,6 +36,6 @@ exports.GenServer = function (_a) {
         },
         handleCall: handleCall
     };
-    me = conqur.create(processDef);
+    me = core_1.create(processDef);
     return me;
 };

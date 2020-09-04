@@ -5,6 +5,7 @@ var core_1 = require("./core");
 var GenServer_1 = require("./GenServer");
 var Bus_1 = require("./Bus");
 var Registry_1 = require("./Registry");
+var util_1 = require("./util");
 var correctIndex = function (index) { return isNaN(parseInt(index)) ? index : parseInt(index); };
 var assignNestedValue = function (remainingPath, value, currentTarget) {
     if (remainingPath.length == 0) {
@@ -52,8 +53,13 @@ var getState = function (scope, busName) {
                 },
                 get: function (self, state, msg) {
                     var name = msg.name;
-                    var path = name.split('.');
-                    return getNestedValue(path, state);
+                    if (util_1.isNil(name) || undefined === name || name == '' || name == '.') {
+                        return getNestedValue([], state);
+                    }
+                    else {
+                        var path = name.split('.');
+                        return getNestedValue(path, state);
+                    }
                 }
             }
         }), registryName);
@@ -64,6 +70,7 @@ var getState = function (scope, busName) {
             core_1.call(Registry_1.Registry.lookup(registryName), { type: 'set', name: name, value: value });
         },
         get: function (name) {
+            if (name === void 0) { name = null; }
             return core_1.call(Registry_1.Registry.lookup(registryName), { type: 'get', name: name });
         }
     };
