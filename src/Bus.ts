@@ -55,6 +55,9 @@ getBus = (name) => {
           return state;
         },
         processQueue: (self, state, _msg) => {
+          if (!!state.debug) {
+            console.log('Bus/processQueue',{state});
+          }
           if (state.handleQueue.length > 0) {
             const handleEntry = state.handleQueue.shift();
             const { event, handler } = handleEntry;
@@ -76,7 +79,18 @@ getBus = (name) => {
         }
       },
       callHandlers: {
+        debug: (self, state, msg) => {
+          if (state.debug == undefined || !state.debug) {
+            state.debug = true;
+          } else {
+            state.debug = false;
+          }
+          return state.debug;
+        },
         registerHandler: (self, state, msg) => {
+          if (!!state.debug) {
+            console.log('Bus/registerHandler',{state, msg});
+          }
           const { event } = msg;
           let id = state._handlerId++;
           delete msg['type'];
@@ -92,6 +106,9 @@ getBus = (name) => {
           return id;
         },
         sendEvent: (self, state, msg) => {
+          if  (!!state.debug) {
+            console.log('Bus/sendEvent', {state, msg});
+          }
           const { event } = msg;
           const { type } = event;
           if (!state.handlers.hasOwnProperty(type)) {
@@ -140,6 +157,9 @@ getBus = (name) => {
     },
     unhandle: (handlerId) => {
       return call(Registry.lookup(_registryName), { type: 'removeHandler', id: handlerId });
+    },
+    debug: () => {
+      return call(Registry.lookup(_registryName), { type: 'debug'});
     }
   };
 };
