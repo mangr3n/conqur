@@ -1,7 +1,10 @@
 import { cast, call } from './core';
 import { GenServer } from './GenServer';
+import { getSelf } from './util/self';
 
-const _process = GenServer({
+const _self = getSelf();
+
+_self._registry = _self._registry || GenServer({
   name: 'Registry',
   initialState: {
     processMap: {}
@@ -28,9 +31,9 @@ const _process = GenServer({
 
 export const Registry = {
   create: (process, name) => {
-    return call(_process, { type: 'create', process, name});
+    return call(_self._registry, { type: 'create', process, name});
   },
   lookup: (name) => {
-    return call(_process, {type: 'lookup', name});
+    return call(_self._registry, {type: 'lookup', name});
   }
 }
