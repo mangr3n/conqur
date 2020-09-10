@@ -34,7 +34,7 @@ var getNestedValue = function (remainingPath, currentTarget) {
 var getState = function (scope, busName) {
     var busApi = Bus_1.Bus.getBus(busName);
     var registryName = "State[" + scope + "]";
-    if (Registry_1.Registry.lookup(registryName) === null) {
+    if (util_1.isNil(Registry_1.Registry.lookup(registryName))) {
         var _processID = GenServer_1.GenServer({
             name: registryName,
             initialState: {},

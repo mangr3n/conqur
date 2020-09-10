@@ -34,7 +34,7 @@ const getState = (scope, busName) => {
   const busApi = Bus.getBus(busName);
 
   const registryName = `State[${scope}]`;
-  if (Registry.lookup(registryName) === null) {
+  if (isNil(Registry.lookup(registryName))) {
     const _processID = GenServer({
       name: registryName,
       initialState: {},
