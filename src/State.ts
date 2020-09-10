@@ -34,48 +34,46 @@ const getState = (scope, busName) => {
   const busApi = Bus.getBus(busName);
 
   const registryName = `State[${scope}]`;
-  if (!Registry.lookup(registryName) !== null) {
-    Registry.create(
-      GenServer({
-        name: registryName,
-        initialState: {},
-        castHandlers: {
-          // Are there any?
+  if (Registry.lookup(registryName) === null) {
+    const _processID = GenServer({
+      name: registryName,
+      initialState: {},
+      castHandlers: {
+        // Are there any?
+      },
+      callHandlers: {
+        set: (self, state, msg) => {
+          const { name, value } = msg;
+          const oldValue = getNestedValue(name.split('.'), state);
+          const path = name.split('.');
+          const firstLeg = path.shift();
+          state[firstLeg] = assignNestedValue(path, value, state[firstLeg]);
+          busApi.sendEvent({ type: `${name}:changed`, oldValue, newValue: value });
+          return;
         },
-        callHandlers: {
-          set: (self, state, msg) => {
-            const { name, value } = msg;
-            const oldValue = getNestedValue(name.split('.'), state);
+        get: (self, state, msg) => {
+          const { name } = msg;
+          if (isNil(name) || undefined === name || name == '' || name == '.') {
+            return getNestedValue([], state);
+          } else {
             const path = name.split('.');
-            const firstLeg = path.shift();
-            state[firstLeg] = assignNestedValue(path, value, state[firstLeg]);
-            busApi.sendEvent({ type: `${name}:changed`, oldValue, newValue: value });
-            return;
-          },
-          get: (self, state, msg) => {
-            const { name } = msg;
-            if (isNil(name) || undefined === name || name == '' || name == '.') {
-              return getNestedValue([],state);
-            } else {
-              const path = name.split('.');
-              return getNestedValue(path, state);
-            }
+            return getNestedValue(path, state);
           }
         }
-      }),
-      registryName
-    );
+      }
+    });
+    Registry.create(_processID,registryName);
   }
 
-  return {
-    getState,
-    set: (name, value) => {
-      call(Registry.lookup(registryName), { type: 'set', name, value });
-    },
-    get: (name:string = null) => {
-      return call(Registry.lookup(registryName), { type: 'get', name });
-    }
-  };
+return {
+  getState,
+  set: (name, value) => {
+    call(Registry.lookup(registryName), { type: 'set', name, value });
+  },
+  get: (name: string = null) => {
+    return call(Registry.lookup(registryName), { type: 'get', name });
+  }
+};
 };
 
-export const State  = getState('global', 'mainBus');
+export const State = getState('global', 'mainBus');

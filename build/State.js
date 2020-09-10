@@ -34,8 +34,8 @@ var getNestedValue = function (remainingPath, currentTarget) {
 var getState = function (scope, busName) {
     var busApi = Bus_1.Bus.getBus(busName);
     var registryName = "State[" + scope + "]";
-    if (!Registry_1.Registry.lookup(registryName) !== null) {
-        Registry_1.Registry.create(GenServer_1.GenServer({
+    if (Registry_1.Registry.lookup(registryName) === null) {
+        var _processID = GenServer_1.GenServer({
             name: registryName,
             initialState: {},
             castHandlers: {
@@ -62,7 +62,8 @@ var getState = function (scope, busName) {
                     }
                 }
             }
-        }), registryName);
+        });
+        Registry_1.Registry.create(_processID, registryName);
     }
     return {
         getState: getState,
