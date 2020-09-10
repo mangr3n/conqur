@@ -38,7 +38,9 @@ let getBus = null;
 getBus = (name) => {
   const _registryName = `Bus[${name}]`;
   if (Registry.lookup(_registryName) == null) {
-    const bus = GenServer({
+    let bus = null;
+    const debugLabel = () => `${_registryName}/[pid: ${bus}]`;
+    bus = GenServer({
       initialState: {
         _handlerId: 0,
         idMap: {},
@@ -48,6 +50,9 @@ getBus = (name) => {
       name: _registryName,
       castHandlers: {
         init: (self, state, msg) => {
+          if (state.debug) {
+            console.log(`${debugLabel()}/init`,{state,msg});
+          }
           const { handlers } = msg;
           for (let idx = 0; idx < handlers.length; idx++) {
             const { event, options, handler } = handlers[idx];
@@ -57,7 +62,7 @@ getBus = (name) => {
         },
         processQueue: (self, state, _msg) => {
           if (!!state.debug) {
-            console.log('Bus/processQueue',{state});
+            console.log(`${debugLabel()}/processQueue`,{state});
           }
           if (state.handleQueue.length > 0) {
             const handleEntry = state.handleQueue.shift();
@@ -90,7 +95,7 @@ getBus = (name) => {
         },
         registerHandler: (self, state, msg) => {
           if (!!state.debug) {
-            console.log('Bus/registerHandler',{state, msg});
+            console.log(`${debugLabel()}/registerHandler`,{state, msg});
           }
           const { event } = msg;
           let id = state._handlerId++;
@@ -108,7 +113,7 @@ getBus = (name) => {
         },
         sendEvent: (self, state, msg) => {
           if  (!!state.debug) {
-            console.log('Bus/sendEvent', {state, msg});
+            console.log(`${debugLabel()}/sendEvent`, {state, msg});
           }
           const { event } = msg;
           const { type } = event;
@@ -125,6 +130,9 @@ getBus = (name) => {
           return state;
         },
         removeHandler: (self, state, msg) => {
+          if (!!state.debug) {
+            console.log(`${debugLabel()}/removeHandler`,{state,msg});
+          }
           const { id } = msg;
           const event = state.idMap[id].event;
           delete state.idMap[id];

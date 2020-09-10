@@ -19,7 +19,9 @@ var getBus = null;
 getBus = function (name) {
     var _registryName = "Bus[" + name + "]";
     if (Registry_1.Registry.lookup(_registryName) == null) {
-        var bus = GenServer_1.GenServer({
+        var bus_1 = null;
+        var debugLabel_1 = function () { return _registryName + "/[pid: " + bus_1 + "]"; };
+        bus_1 = GenServer_1.GenServer({
             initialState: {
                 _handlerId: 0,
                 idMap: {},
@@ -29,6 +31,9 @@ getBus = function (name) {
             name: _registryName,
             castHandlers: {
                 init: function (self, state, msg) {
+                    if (state.debug) {
+                        console.log(debugLabel_1() + "/init", { state: state, msg: msg });
+                    }
                     var handlers = msg.handlers;
                     for (var idx = 0; idx < handlers.length; idx++) {
                         var _a = handlers[idx], event_1 = _a.event, options = _a.options, handler = _a.handler;
@@ -37,6 +42,9 @@ getBus = function (name) {
                     return state;
                 },
                 processQueue: function (self, state, _msg) {
+                    if (!!state.debug) {
+                        console.log(debugLabel_1() + "/processQueue", { state: state });
+                    }
                     if (state.handleQueue.length > 0) {
                         var handleEntry = state.handleQueue.shift();
                         var event_2 = handleEntry.event, handler = handleEntry.handler;
@@ -59,7 +67,19 @@ getBus = function (name) {
                 }
             },
             callHandlers: {
+                debug: function (self, state, msg) {
+                    if (state.debug == undefined || !state.debug) {
+                        state.debug = true;
+                    }
+                    else {
+                        state.debug = false;
+                    }
+                    return state.debug;
+                },
                 registerHandler: function (self, state, msg) {
+                    if (!!state.debug) {
+                        console.log(debugLabel_1() + "/registerHandler", { state: state, msg: msg });
+                    }
                     var event = msg.event;
                     var id = state._handlerId++;
                     delete msg['type'];
@@ -72,6 +92,9 @@ getBus = function (name) {
                     return id;
                 },
                 sendEvent: function (self, state, msg) {
+                    if (!!state.debug) {
+                        console.log(debugLabel_1() + "/sendEvent", { state: state, msg: msg });
+                    }
                     var event = msg.event;
                     var type = event.type;
                     if (!state.handlers.hasOwnProperty(type)) {
@@ -88,6 +111,9 @@ getBus = function (name) {
                     return state;
                 },
                 removeHandler: function (self, state, msg) {
+                    if (!!state.debug) {
+                        console.log(debugLabel_1() + "/removeHandler", { state: state, msg: msg });
+                    }
                     var id = msg.id;
                     var event = state.idMap[id].event;
                     delete state.idMap[id];
@@ -103,7 +129,7 @@ getBus = function (name) {
                 }
             }
         });
-        Registry_1.Registry.create(bus, _registryName);
+        Registry_1.Registry.create(bus_1, _registryName);
     }
     return {
         getBus: getBus,
@@ -123,6 +149,9 @@ getBus = function (name) {
         },
         unhandle: function (handlerId) {
             return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'removeHandler', id: handlerId });
+        },
+        debug: function () {
+            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'debug' });
         }
     };
 };
