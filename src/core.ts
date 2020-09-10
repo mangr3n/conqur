@@ -14,8 +14,8 @@ const conqurSystem = (self as any)._conqurInners = (self as any)._conqurInners |
   errors: {
     byMessageId: {}, byProcessId: {}
   },
-  pidCounter: 0,
-  midCounter: 0
+  pidCounter: 1,
+  midCounter: 1
 };
 
 const registerProcess = (pid: ProcessID, process: Process) => {

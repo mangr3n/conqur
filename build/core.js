@@ -14,8 +14,8 @@ var conqurSystem = self._conqurInners = self._conqurInners || {
     errors: {
         byMessageId: {}, byProcessId: {}
     },
-    pidCounter: 0,
-    midCounter: 0
+    pidCounter: 1,
+    midCounter: 1
 };
 var registerProcess = function (pid, process) {
     conqurSystem.processes[pid] = process;
