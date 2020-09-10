@@ -45,6 +45,7 @@ getBus = function (name) {
                         if (!_handler(event_2)) {
                             state.handleQueue.push(handleEntry);
                             if (state.handleQueue.length > 1) {
+                                // possible infinite loop...
                                 core_1.cast(self(), { type: 'processQueue' });
                             }
                         }

@@ -1,6 +1,36 @@
 import { cast, call } from './core';
 import { Registry } from './Registry';
 import { GenServer } from './GenServer';
+import { ProcessID } from './types';
+
+declare var BusFn;
+
+type HandlerID = number;
+type EventType = string;
+
+interface BusEvent {
+  type: EventType;
+  [index:string]: any;
+}
+
+type HandlerFn = (event: BusEvent) => boolean;
+
+interface HandlerRegistration {
+  event: EventType;
+  handler: HandlerFn;
+  options: Object;
+}
+
+interface BusAPI {
+  getBus: BusFn;
+  initialize: ([HandlerRegistration]) => void;
+  sendEvent: (event: BusEvent) => void;
+  handle: (event: EventType, handler: HandlerFn, options: Object) => HandlerID;
+  handleOnce: (event: EventType, handler: HandlerFn) => HandlerID;
+  unhandle: (id: HandlerID) => void;
+}
+
+type BusFn = (string) => BusAPI;
 
 
 let getBus = null;
@@ -33,6 +63,7 @@ getBus = (name) => {
             if (!_handler(event)) {
               state.handleQueue.push(handleEntry);
               if (state.handleQueue.length > 1) {
+                // possible infinite loop...
                 cast(self(), { type: 'processQueue' });
               }
             } else {
@@ -113,4 +144,4 @@ getBus = (name) => {
   };
 };
 
-export const Bus = getBus('mainBus');
+export const Bus: BusAPI = getBus('mainBus');
