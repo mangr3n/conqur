@@ -118,7 +118,7 @@ getBus = (name) => {
           const { event } = msg;
           const { type } = event;
           if (!state.handlers.hasOwnProperty(type)) {
-            console.log(`${_registryName} has no handlers for '${type}'`);
+            console.log(`${debugLabel()} has no handlers for '${type}'`);
           } else {
             const handlers = state.handlers[type];
             for (let idx = 0; idx < handlers.length; idx++) {
