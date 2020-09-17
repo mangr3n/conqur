@@ -29,7 +29,8 @@ getBus = function (name) {
                 handleQueue: [],
                 _queueInProcess: [],
                 _notHandledQueue: [],
-                _inProcess: false
+                _inProcess: false,
+                _pending: false
             },
             name: _registryName,
             castHandlers: {
@@ -48,7 +49,6 @@ getBus = function (name) {
                     if (!!state.debug) {
                         console.log(debugLabel_1() + "/processQueue", { state: state });
                     }
-                    var eventsToSend = [];
                     if (!state._inProcess && state.handleQueue.length > 0) {
                         state._inProcess = true;
                         // Copy the queue to _queueInProcess
@@ -61,8 +61,8 @@ getBus = function (name) {
                             var event_2 = handleEntry.event, handler = handleEntry.handler;
                             var id = handler.id, options = handler.options;
                             var _handler = handler.handler;
+                            handleEntry.tries++;
                             try {
-                                handleEntry.tries++;
                                 if (!_handler(event_2)) {
                                     state._notHandledQueue.push(handleEntry);
                                 }
@@ -73,21 +73,19 @@ getBus = function (name) {
                                 }
                             }
                             catch (error) {
-                                eventsToSend.push({ type: 'error', error: error, source: handleEntry });
+                                if (options.once) {
+                                    core_1.call(self(), { type: 'removeHandler', id: id });
+                                }
+                                core_1.call(self(), { type: 'sendEvent', event: { type: 'error', error: error, source: handleEntry } });
                             }
                         }
-                    }
-                    for (var x in eventsToSend) {
-                        core_1.call(self(), { type: 'sendEvent', event: x });
-                    }
-                    if (state._inProcess) {
-                        var willFire = state.handleQueue.length > 1;
                         while (state._notHandledQueue.length > 0) {
                             var handleEntry = state._notHandledQueue.shift();
                             state.handleQueue.push(handleEntry);
                         }
                         state._inProcess = false;
-                        if (willFire) {
+                        if (state._pending) {
+                            state._pending = false;
                             core_1.cast(self(), { type: 'processQueue' });
                         }
                     }
@@ -136,7 +134,10 @@ getBus = function (name) {
                             state.handleQueue.push({ handler: handlerEntry, event: event, tries: 0 });
                         }
                     }
-                    if (!state._inProcess) {
+                    if (state._inProcess) {
+                        state._pending = true;
+                    }
+                    else {
                         core_1.cast(self(), { type: 'processQueue' });
                     }
                     return state;
