@@ -4,7 +4,7 @@
   "description": "Framework for creating Processes with Erlang/Elixir message passing semantics",
   "main": "build/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "ts-node node_modules/tape/bin/tape ./**/__tests__/*.test.ts",
     "compile": "tsc",
     "clean": "rm -rf build"
   },
