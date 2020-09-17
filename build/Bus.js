@@ -26,7 +26,10 @@ getBus = function (name) {
                 _handlerId: 0,
                 idMap: {},
                 handlers: {},
-                handleQueue: []
+                handleQueue: [],
+                _queueInProcess: [],
+                _notHandledQueue: [],
+                _inProcess: false
             },
             name: _registryName,
             castHandlers: {
@@ -45,22 +48,47 @@ getBus = function (name) {
                     if (!!state.debug) {
                         console.log(debugLabel_1() + "/processQueue", { state: state });
                     }
-                    if (state.handleQueue.length > 0) {
-                        var handleEntry = state.handleQueue.shift();
-                        var event_2 = handleEntry.event, handler = handleEntry.handler;
-                        var id = handler.id, options = handler.options;
-                        var _handler = handler.handler;
-                        if (!_handler(event_2)) {
-                            state.handleQueue.push(handleEntry);
-                            if (state.handleQueue.length > 1) {
-                                // possible infinite loop...
-                                core_1.cast(self(), { type: 'processQueue' });
+                    var eventsToSend = [];
+                    if (!state._inProcess && state.handleQueue.length > 0) {
+                        state._inProcess = true;
+                        // Copy the queue to _queueInProcess
+                        // Empty the queue to accept new events
+                        state._queueInProcess = state.handleQueue;
+                        state.handleQueue = [];
+                        state._notHandledQueue = [];
+                        while (state._queueInProcess.length > 0) {
+                            var handleEntry = state._queueInProcess.shift();
+                            var event_2 = handleEntry.event, handler = handleEntry.handler;
+                            var id = handler.id, options = handler.options;
+                            var _handler = handler.handler;
+                            try {
+                                handleEntry.tries++;
+                                if (!_handler(event_2)) {
+                                    state._notHandledQueue.push(handleEntry);
+                                }
+                                else {
+                                    if (options.once) {
+                                        core_1.call(self(), { type: 'removeHandler', id: id });
+                                    }
+                                }
+                            }
+                            catch (error) {
+                                eventsToSend.push({ type: 'error', error: error, source: handleEntry });
                             }
                         }
-                        else {
-                            if (options.once) {
-                                core_1.call(self(), { type: 'removeHandler', id: id });
-                            }
+                    }
+                    for (var x in eventsToSend) {
+                        core_1.call(self(), { type: 'sendEvent', event: x });
+                    }
+                    if (state._inProcess) {
+                        var willFire = state.handleQueue.length > 1;
+                        while (state._notHandledQueue.length > 0) {
+                            var handleEntry = state._notHandledQueue.shift();
+                            state.handleQueue.push(handleEntry);
+                        }
+                        state._inProcess = false;
+                        if (willFire) {
+                            core_1.cast(self(), { type: 'processQueue' });
                         }
                     }
                     return state;
@@ -98,16 +126,19 @@ getBus = function (name) {
                     var event = msg.event;
                     var type = event.type;
                     if (!state.handlers.hasOwnProperty(type)) {
-                        console.log(debugLabel_1() + " has no handlers for '" + type + "'");
+                        if (!!state.debug)
+                            console.log(debugLabel_1() + " has no handlers for '" + type + "'");
                     }
                     else {
                         var handlers = state.handlers[type];
                         for (var idx = 0; idx < handlers.length; idx++) {
                             var handlerEntry = handlers[idx];
-                            state.handleQueue.push({ handler: handlerEntry, event: event });
+                            state.handleQueue.push({ handler: handlerEntry, event: event, tries: 0 });
                         }
                     }
-                    core_1.cast(self(), { type: 'processQueue' });
+                    if (!state._inProcess) {
+                        core_1.cast(self(), { type: 'processQueue' });
+                    }
                     return state;
                 },
                 removeHandler: function (self, state, msg) {

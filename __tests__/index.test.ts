@@ -1,41 +1,45 @@
-import { doesNotMatch } from "assert";
-import { GenServer } from '../src/genserver';
-import { setAsap } from "../src/util/setasap";
+import * as test from 'tape';
+import { GenServer, create, cast, call, destroy } from '../src/index';
 
-declare var require;
-const { create, cast, call, destroy } = require('../src/index');
-
-declare var expect;
-declare var test;
-
-test('expect create to return a process id', () => {
-  expect(Number.isInteger(create({name: "TestCreateProcess",handleCast: (msg) => {
-    return;
-  }}))).toBe(true);
+test('expect create to return a process id', (t) => {
+  const processId = create({
+    name: "TestCreateProcess", 
+    self: () => processId,
+    handleCast: (msg) => {
+      return;
+    }
+  });
+  t.ok(Number.isInteger(processId));
+  destroy(processId);
+  t.end();
 });
 
-test('expect cast to invoke handleCast', (done) => {
+test('expect cast to invoke handleCast', (t) => {
   const processDef = { 
-    name: 'TestCast', 
+    name: 'TestCast',
+    self: () => processId, 
     handleCast: (msg) => {
-      expect(msg).toBe(1);
-      done()
+      t.equal(msg,1);
+      t.end();
     }
   };
   const processId = create(processDef);
   cast(processId,1);
 });
 
-test('expect call to invoke handleCall', () => {
+test('expect call to invoke handleCall', t => {
   const processDef = {
     name: 'TestCall',
+    self: () => processId,
+    handleCast: () => null,
     handleCall: (msg) => msg
   };
   const processId = create(processDef);
-  expect(call(processId,1)).toBe(1);
+  t.equal(call(processId,1),1);
+  t.end();
 });
 
-test('expect a GenServer to maintain internal state', (done) => {
+test('expect a GenServer to maintain internal state', t => {
   const processId = GenServer({
     name: 'GenServerTest',
     initialState: { count: 0 },
@@ -65,14 +69,14 @@ test('expect a GenServer to maintain internal state', (done) => {
     }
   });
 
-  expect(call(processId,{type: 'inc'})).toBe(1);
-  expect(call(processId, {type: 'dec'})).toBe(0);
+  t.equal(call(processId,{type: 'inc'}),1);
+  t.equal(call(processId, {type: 'dec'}),0);
 
   cast(processId,{type: 'inc', done: () => {
-    expect(call(processId, {type: 'count'})).toBe(1);
+    t.equal(call(processId, {type: 'count'}),1);
   }});
   cast(processId, {type: 'dec', done: () => {
-    expect(call(processId, {type: 'count'})).toBe(0);
-    done();
+    t.equal(call(processId, {type: 'count'}),0);
+    t.end();
   }});
 });
