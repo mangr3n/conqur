@@ -149,7 +149,7 @@ getBus = (name) => {
             console.log(`${debugLabel()}/sendEvent`, { state, msg });
           }
           if (!! state.logEvents) {
-            console.log(`${debugLabel()}/event: `,msg);
+            console.log(`${debugLabel()}/event: `,msg.event);
           }
           const { event } = msg;
           const { type } = event;

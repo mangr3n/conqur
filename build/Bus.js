@@ -131,7 +131,7 @@ getBus = function (name) {
                         console.log(debugLabel_1() + "/sendEvent", { state: state, msg: msg });
                     }
                     if (!!state.logEvents) {
-                        console.log(debugLabel_1() + "/event: ", msg);
+                        console.log(debugLabel_1() + "/event: ", msg.event);
                     }
                     var event = msg.event;
                     var type = event.type;
