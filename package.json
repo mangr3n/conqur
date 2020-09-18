@@ -1,6 +1,6 @@
 {
   "name": "conqur",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Framework for creating Processes with Erlang/Elixir message passing semantics",
   "main": "build/index.js",
   "scripts": {
