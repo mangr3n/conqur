@@ -118,6 +118,14 @@ getBus = (name) => {
           }
           return state.debug;
         },
+        logEvents: (self, state, msg) => {
+          if (state.logEvents == undefined || !state.logEvents) {
+            state.logEvents = true;
+          } else {
+            state.logEvents = false;
+          }
+          return state.logEvents;
+        },
         registerHandler: (self, state, msg) => {
           if (!!state.debug) {
             console.log(`${debugLabel()}/registerHandler`, { state, msg });
@@ -139,6 +147,9 @@ getBus = (name) => {
         sendEvent: (self, state, msg) => {
           if (!!state.debug) {
             console.log(`${debugLabel()}/sendEvent`, { state, msg });
+          }
+          if (!! state.logEvents) {
+            console.log(`${debugLabel()}/event: `,msg);
           }
           const { event } = msg;
           const { type } = event;
@@ -198,6 +209,9 @@ getBus = (name) => {
     },
     debug: () => {
       return call(Registry.lookup(_registryName), { type: 'debug' });
+    }, 
+    logEvents: () => {
+      return call(Registry.lookup(_registryName), { type: 'logEvents' });
     }
   };
 };

@@ -102,6 +102,15 @@ getBus = function (name) {
                     }
                     return state.debug;
                 },
+                logEvents: function (self, state, msg) {
+                    if (state.logEvents == undefined || !state.logEvents) {
+                        state.logEvents = true;
+                    }
+                    else {
+                        state.logEvents = false;
+                    }
+                    return state.logEvents;
+                },
                 registerHandler: function (self, state, msg) {
                     if (!!state.debug) {
                         console.log(debugLabel_1() + "/registerHandler", { state: state, msg: msg });
@@ -120,6 +129,9 @@ getBus = function (name) {
                 sendEvent: function (self, state, msg) {
                     if (!!state.debug) {
                         console.log(debugLabel_1() + "/sendEvent", { state: state, msg: msg });
+                    }
+                    if (!!state.logEvents) {
+                        console.log(debugLabel_1() + "/event: ", msg);
                     }
                     var event = msg.event;
                     var type = event.type;
@@ -184,6 +196,9 @@ getBus = function (name) {
         },
         debug: function () {
             return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'debug' });
+        },
+        logEvents: function () {
+            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'logEvents' });
         }
     };
 };
