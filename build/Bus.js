@@ -94,21 +94,13 @@ getBus = function (name) {
             },
             callHandlers: {
                 debug: function (self, state, msg) {
-                    if (state.debug == undefined || !state.debug) {
-                        state.debug = true;
-                    }
-                    else {
-                        state.debug = false;
-                    }
+                    var turnOn = msg.turnOn;
+                    state.debug = turnOn;
                     return state.debug;
                 },
                 logEvents: function (self, state, msg) {
-                    if (state.logEvents == undefined || !state.logEvents) {
-                        state.logEvents = true;
-                    }
-                    else {
-                        state.logEvents = false;
-                    }
+                    var turnOn = msg.turnOn;
+                    state.logEvents = turnOn;
                     return state.logEvents;
                 },
                 registerHandler: function (self, state, msg) {
@@ -194,11 +186,13 @@ getBus = function (name) {
         unhandle: function (handlerId) {
             return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'removeHandler', id: handlerId });
         },
-        debug: function () {
-            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'debug' });
+        debug: function (turnOn) {
+            if (turnOn === void 0) { turnOn = true; }
+            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'debug', turnOn: turnOn });
         },
-        logEvents: function () {
-            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'logEvents' });
+        logEvents: function (turnOn) {
+            if (turnOn === void 0) { turnOn = true; }
+            return core_1.call(Registry_1.Registry.lookup(_registryName), { type: 'logEvents', turnOn: turnOn });
         }
     };
 };

@@ -111,19 +111,13 @@ getBus = (name) => {
       },
       callHandlers: {
         debug: (self, state, msg) => {
-          if (state.debug == undefined || !state.debug) {
-            state.debug = true;
-          } else {
-            state.debug = false;
-          }
+          const { turnOn } = msg;
+          state.debug = turnOn;
           return state.debug;
         },
         logEvents: (self, state, msg) => {
-          if (state.logEvents == undefined || !state.logEvents) {
-            state.logEvents = true;
-          } else {
-            state.logEvents = false;
-          }
+          const { turnOn } = msg;
+          state.logEvents = turnOn;
           return state.logEvents;
         },
         registerHandler: (self, state, msg) => {
@@ -207,11 +201,11 @@ getBus = (name) => {
     unhandle: (handlerId) => {
       return call(Registry.lookup(_registryName), { type: 'removeHandler', id: handlerId });
     },
-    debug: () => {
-      return call(Registry.lookup(_registryName), { type: 'debug' });
+    debug: (turnOn=true) => {
+      return call(Registry.lookup(_registryName), { type: 'debug', turnOn });
     }, 
-    logEvents: () => {
-      return call(Registry.lookup(_registryName), { type: 'logEvents' });
+    logEvents: (turnOn=true) => {
+      return call(Registry.lookup(_registryName), { type: 'logEvents', turnOn});
     }
   };
 };
