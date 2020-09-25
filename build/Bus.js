@@ -63,13 +63,14 @@ getBus = function (name) {
                             var _handler = handler.handler;
                             handleEntry.tries++;
                             try {
-                                if (!_handler(event_2)) {
-                                    state._notHandledQueue.push(handleEntry);
-                                }
-                                else {
+                                var result = _handler(event_2);
+                                if (result === undefined || result) {
                                     if (options.once) {
                                         core_1.call(self(), { type: 'removeHandler', id: id });
                                     }
+                                }
+                                else {
+                                    state._notHandledQueue.push(handleEntry);
                                 }
                             }
                             catch (error) {

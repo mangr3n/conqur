@@ -82,12 +82,13 @@ getBus = (name) => {
               const _handler = handler.handler;
               handleEntry.tries++;
               try {
-                if (!_handler(event)) {
-                  state._notHandledQueue.push(handleEntry);
-                } else {
+                const result = _handler(event);
+                if (result === undefined || result) {
                   if (options.once) {
-                    call(self(), {type: 'removeHandler', id});
+                    call(self(), { type: 'removeHandler', id });
                   }
+                } else {
+                  state._notHandledQueue.push(handleEntry);
                 }
               } catch (error) {
                 if (options.once) {
