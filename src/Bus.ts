@@ -168,16 +168,18 @@ getBus = (name) => {
             console.log(`${debugLabel()}/removeHandler`, { state, msg });
           }
           const { id } = msg;
-          const event = state.idMap[id].event;
-          delete state.idMap[id];
-          const handlers = state.handlers[event];
-          const newHandlers = [];
-          for (let idx = 0; idx < handlers.length; idx++) {
-            const entry = handlers[idx];
-            if (id == entry.id) continue;
-            newHandlers.push(entry);
+          if (state.idMap[id]) {
+            const event = state.idMap[id].event;
+            const handlers = state.handlers[event];
+            const newHandlers = [];
+            for (let idx = 0; idx < handlers.length; idx++) {
+              const entry = handlers[idx];
+              if (id == entry.id) continue;
+              newHandlers.push(entry);
+            }
+            state.handlers[event] = newHandlers;
+            delete state.idMap[id];
           }
-          state.handlers[event] = newHandlers;
         }
       }
     });

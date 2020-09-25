@@ -151,17 +151,19 @@ getBus = function (name) {
                         console.log(debugLabel_1() + "/removeHandler", { state: state, msg: msg });
                     }
                     var id = msg.id;
-                    var event = state.idMap[id].event;
-                    delete state.idMap[id];
-                    var handlers = state.handlers[event];
-                    var newHandlers = [];
-                    for (var idx = 0; idx < handlers.length; idx++) {
-                        var entry = handlers[idx];
-                        if (id == entry.id)
-                            continue;
-                        newHandlers.push(entry);
+                    if (state.idMap[id]) {
+                        var event_3 = state.idMap[id].event;
+                        var handlers = state.handlers[event_3];
+                        var newHandlers = [];
+                        for (var idx = 0; idx < handlers.length; idx++) {
+                            var entry = handlers[idx];
+                            if (id == entry.id)
+                                continue;
+                            newHandlers.push(entry);
+                        }
+                        state.handlers[event_3] = newHandlers;
+                        delete state.idMap[id];
                     }
-                    state.handlers[event] = newHandlers;
                 }
             }
         });
