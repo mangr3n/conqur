@@ -20,6 +20,17 @@ const assignNestedValue = (remainingPath, value, currentTarget) => {
   }
 };
 
+const deleteItemAt = (remainingPath, currentTarget) => {
+  if (remainingPath.length == 0) return;
+  if (remainingPath.length == 1) {
+    delete currentTarget[remainingPath[0]];
+    return;
+  }
+  const index = correctIndex(remainingPath.shift());
+  deleteItemAt(remainingPath,currentTarget[index]);
+  return;
+};
+
 const getNestedValue = (remainingPath, currentTarget) => {
   if (remainingPath.length == 0) {
     return currentTarget;
@@ -51,6 +62,11 @@ const getState = (scope, busName) => {
           busApi.sendEvent({ type: `${name}:changed`, oldValue, newValue: value });
           return;
         },
+        unset: (self, state, msg) => {
+          const { name } = msg;
+          deleteItemAt(name.split('.'), state);
+          return;
+        },
         get: (self, state, msg) => {
           const { name } = msg;
           if (isNil(name) || undefined === name || name == '' || name == '.') {
@@ -69,6 +85,9 @@ return {
   getState,
   set: (name, value) => {
     call(Registry.lookup(registryName), { type: 'set', name, value });
+  },
+  unset: (name) => {
+    call(Registry.lookup(registryName), { type: 'unset', name });
   },
   get: (name: string = null) => {
     return call(Registry.lookup(registryName), { type: 'get', name });

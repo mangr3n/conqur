@@ -24,6 +24,7 @@ test('Bus should', t => {
         t.equal(counter, 2);
         t.end()
         Bus.unhandle(hID);
+        State.unset('a');
         return true;
       }
     }, {});
@@ -54,7 +55,6 @@ test('Bus should', t => {
 
     const testID = Bus.handle('test:retry', (v) => {
       counter++;
-      // console.error('test:retry: ', State.get('b'));
       if (State.get('b') !== "test") {
         return false;
       } else {
@@ -62,6 +62,7 @@ test('Bus should', t => {
         Bus.unhandle(testID);
         Bus.unhandle(errID);
         t.end();
+        State.unset('b');
         return true;
       }
     }, {});
