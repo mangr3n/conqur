@@ -87,31 +87,56 @@ GenServer provides a simple abstraction for building a stateful process that res
 Given the above GenServer it makes sense to actually expose an API like this:
 ```
 const CounterAPI = (counterName) => {
-    GenServer({
-    name: 'GenServerTest',
-    initialState: { count: 0 },
-    castHandlers: {
-      inc: (_self, state, _) => {
-        state.count = state.count+1;
-        return state;
+  const name = `Counter[${counterName}]`;
+  let _counter = Registry.lookup(name);
+  if (Registry.lookup(name) == null) {
+    Registry.create(GenServer({
+      name: `Counter[${counterName}]`,
+      initialState: { count: 0 },
+      castHandlers: {
+        inc: (_self, state, _) => {
+          state.count = state.count+1;
+          return state;
+        },
+        dec: (_self, state, _) => {
+          return {
+            count: state.count - 1
+          };
+        }
       },
-      dec: (_self, state, _) => {
-        return {
-          count: state.count - 1
-        };
+      callHandlers: {
+        inc: (_self, state, _) => {
+          state.count = state.count+1;
+          return state.count;
+        },
+        dec: (_self, state, _) => {
+          state.count = state.count - 1;
+          return state.count;
+        },
+        count: (_self,state, _) => {
+          return state.count;
+        }
       }
+    }),name);
+  };
+  return {
+    new: CounterAPI,
+    inc: () => {
+      return call(_counter,{type:'inc'});
     },
-    callHandlers: {
-      inc: (_self, state, _) => {
-        state.count = state.count+1;
-        return state.count;
-      },
-      dec: (_self, state, _) => {
-        state.count = state.count - 1;
-        return state.count;
-      },
-      count: (_self,state, _) => {
-        return state.count;
-      }
+    dec: () => {
+      return call(_counter, {type: 'dec'});
+    },
+    count: () => {
+      return call(_counter, {type: 'count'});
     }
-  });
+  };
+};
+
+export Counter = CounterAPI('default'); 
+```
+
+Now this may seem like overkill.  However, by using this pattern, we can build APIs that allow for responsive interleaving of execution.  
+The key is to avoid synchronous execution of long running operations.
+
+Future plans include building a functional API that uses GenServer processes under the covers to allow for responsive long running higher order functions on complex data structures without blocking the single thread of a JavaScript runtime.  This provides an alternate path to highly responsive concurrency in a single threaded context.  Instead of a return value from the `reduce` function we would pass a callback which would catch the result from the process.  That callback might send a message to another Process.

@@ -22,7 +22,22 @@ var assignNestedValue = function (remainingPath, value, currentTarget) {
         }
     }
 };
+var deleteItemAt = function (remainingPath, currentTarget) {
+    if (currentTarget === undefined)
+        return;
+    if (remainingPath.length == 0)
+        return;
+    if (remainingPath.length == 1) {
+        delete currentTarget[remainingPath[0]];
+        return;
+    }
+    var index = correctIndex(remainingPath.shift());
+    deleteItemAt(remainingPath, currentTarget[index]);
+    return;
+};
 var getNestedValue = function (remainingPath, currentTarget) {
+    if (currentTarget === undefined)
+        return undefined;
     if (remainingPath.length == 0) {
         return currentTarget;
     }
@@ -51,6 +66,13 @@ var getState = function (scope, busName) {
                     busApi.sendEvent({ type: name + ":changed", oldValue: oldValue, newValue: value });
                     return;
                 },
+                unset: function (self, state, msg) {
+                    var name = msg.name;
+                    var oldValue = getNestedValue(name.split('.'), state);
+                    deleteItemAt(name.split('.'), state);
+                    busApi.sendEvent({ type: name + ":removed", oldValue: oldValue });
+                    return;
+                },
                 get: function (self, state, msg) {
                     var name = msg.name;
                     if (util_1.isNil(name) || undefined === name || name == '' || name == '.') {
@@ -69,6 +91,9 @@ var getState = function (scope, busName) {
         getState: getState,
         set: function (name, value) {
             core_1.call(Registry_1.Registry.lookup(registryName), { type: 'set', name: name, value: value });
+        },
+        unset: function (name) {
+            core_1.call(Registry_1.Registry.lookup(registryName), { type: 'unset', name: name });
         },
         get: function (name) {
             if (name === void 0) { name = null; }

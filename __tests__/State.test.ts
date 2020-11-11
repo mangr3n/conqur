@@ -19,11 +19,32 @@ test('State should',(t) => {
     t.end();
   });
 
-  t.test('Should return undefined after unset', t => {
+  t.test('return undefined after unset', t => {
     State.set('a', 1);
     State.unset('a');
     t.equal(State.get('a'),undefined);
     t.end();
+  });
+
+  t.test('unset should succeed if the item not present',t => {
+    State.unset('a');
+    t.equal(State.get('a'), undefined);
+    t.end();
+  });
+
+  t.test('unset should not fail on missing nested items', t => {
+    State.unset('a.1');
+    t.end();
+  });
+
+  t.test('unset should notify the Bus that the value was removed', t => {
+    const handlerId = Bus.handle('a:removed',(event) => {
+      t.equal(State.get('a'), undefined);
+      t.end();
+      Bus.unhandle(handlerId);
+      return true;
+    });
+    State.unset('a');
   });
 
   t.test('notify the Bus that a change occured', t => {
@@ -36,5 +57,4 @@ test('State should',(t) => {
     },{});
     State.set('a',2);
   });
-
 });

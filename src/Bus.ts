@@ -25,7 +25,7 @@ interface BusAPI {
   getBus: BusFn;
   initialize: ([HandlerRegistration]) => void;
   sendEvent: (event: BusEvent) => void;
-  handle: (event: EventType, handler: HandlerFn, options: Object) => HandlerID;
+  handle: (event: EventType, handler: HandlerFn, options?: Object) => HandlerID;
   handleOnce: (event: EventType, handler: HandlerFn) => HandlerID;
   unhandle: (id: HandlerID) => void;
   debug: () => boolean;

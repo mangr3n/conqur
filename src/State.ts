@@ -21,6 +21,7 @@ const assignNestedValue = (remainingPath, value, currentTarget) => {
 };
 
 const deleteItemAt = (remainingPath, currentTarget) => {
+  if (currentTarget === undefined) return;
   if (remainingPath.length == 0) return;
   if (remainingPath.length == 1) {
     delete currentTarget[remainingPath[0]];
@@ -32,6 +33,7 @@ const deleteItemAt = (remainingPath, currentTarget) => {
 };
 
 const getNestedValue = (remainingPath, currentTarget) => {
+  if (currentTarget === undefined) return undefined;
   if (remainingPath.length == 0) {
     return currentTarget;
   } else {
@@ -64,7 +66,9 @@ const getState = (scope, busName) => {
         },
         unset: (self, state, msg) => {
           const { name } = msg;
+          const oldValue = getNestedValue(name.split('.'), state);
           deleteItemAt(name.split('.'), state);
+          busApi.sendEvent({ type: `${name}:removed`, oldValue});
           return;
         },
         get: (self, state, msg) => {
