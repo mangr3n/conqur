@@ -1,8 +1,8 @@
 import { setAsap } from "./util/setasap";
-import { isNil } from './util/index';
+import Utils from './util/index';
 import { getSelf } from './util/self';
 import { Process, ProcessID } from './types';
-
+const { isNil } = Utils;
 const self = getSelf();
 
 if (isNil(self)) throw new Error('Cannot start system, cannot resolve self');

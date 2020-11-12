@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.mount = void 0;
 var core_1 = require("./core");
 Object.defineProperty(exports, "create", { enumerable: true, get: function () { return core_1.create; } });
 Object.defineProperty(exports, "call", { enumerable: true, get: function () { return core_1.call; } });
@@ -13,3 +14,8 @@ var State_1 = require("./State");
 Object.defineProperty(exports, "State", { enumerable: true, get: function () { return State_1.State; } });
 var Bus_1 = require("./Bus");
 Object.defineProperty(exports, "Bus", { enumerable: true, get: function () { return Bus_1.Bus; } });
+exports.mount = function () {
+    var Utils = require('./util/index').default;
+    Utils.mountNamespace('conqur', require('./index'));
+    Utils.mountNamespace('conqur.Utils', Utils);
+};

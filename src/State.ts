@@ -2,7 +2,9 @@ import { call, cast } from './core';
 import { GenServer } from './GenServer';
 import { Bus } from './Bus';
 import { Registry } from './Registry';
-import { isNil } from './util';
+import Utils from './util';
+
+const { isNil } = Utils;
 
 const correctIndex = (index) => isNaN(parseInt(index)) ? index : parseInt(index);
 

@@ -6,6 +6,7 @@ var GenServer_1 = require("./GenServer");
 var Bus_1 = require("./Bus");
 var Registry_1 = require("./Registry");
 var util_1 = require("./util");
+var isNil = util_1.default.isNil;
 var correctIndex = function (index) { return isNaN(parseInt(index)) ? index : parseInt(index); };
 var assignNestedValue = function (remainingPath, value, currentTarget) {
     if (remainingPath.length == 0) {
@@ -49,7 +50,7 @@ var getNestedValue = function (remainingPath, currentTarget) {
 var getState = function (scope, busName) {
     var busApi = Bus_1.Bus.getBus(busName);
     var registryName = "State[" + scope + "]";
-    if (util_1.isNil(Registry_1.Registry.lookup(registryName))) {
+    if (isNil(Registry_1.Registry.lookup(registryName))) {
         var _processID = GenServer_1.GenServer({
             name: registryName,
             initialState: {},
@@ -75,7 +76,7 @@ var getState = function (scope, busName) {
                 },
                 get: function (self, state, msg) {
                     var name = msg.name;
-                    if (util_1.isNil(name) || undefined === name || name == '' || name == '.') {
+                    if (isNil(name) || undefined === name || name == '' || name == '.') {
                         return getNestedValue([], state);
                     }
                     else {

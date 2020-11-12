@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenServer = void 0;
 var util_1 = require("./util");
 var core_1 = require("./core");
+var isNil = util_1.default.isNil;
 ;
 exports.GenServer = function (_a) {
     var name = _a.name, castHandlers = _a.castHandlers, callHandlers = _a.callHandlers, initialState = _a.initialState;
@@ -11,7 +12,7 @@ exports.GenServer = function (_a) {
     var self = function () { return me; };
     function handleCall(msg) {
         var type = msg.type;
-        if (util_1.isNil(callHandlers[type])) {
+        if (isNil(callHandlers[type])) {
             throw new Error("Unknown call message type '" + type + "'");
         }
         else {
@@ -24,7 +25,7 @@ exports.GenServer = function (_a) {
         self: self,
         handleCast: function (msg) {
             var type = msg.type;
-            if (util_1.isNil(castHandlers[type])) {
+            if (isNil(castHandlers[type])) {
                 throw new Error("Unknown cast message type '" + type + "'");
             }
             else {

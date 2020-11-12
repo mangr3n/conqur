@@ -1,7 +1,7 @@
-import { isNil } from "./util";
+import Utils from "./util";
 import {create } from './core';
 import { ProcessAccessor } from "./types";
-
+const { isNil } = Utils;
 interface State {
   [index: string]: any;
 }

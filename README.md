@@ -6,7 +6,7 @@ The goal is to bring a proven, battle-tested asynchronous message passing paradi
 `npm -i --save conqur`
 
 In your code:
-`import * as conqur from 'conqur';
+`import * as conqur from 'conqur';`
 
 ## Usage
 

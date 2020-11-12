@@ -4,8 +4,9 @@ exports.call = exports.cast = exports.destroy = exports.create = void 0;
 var setasap_1 = require("./util/setasap");
 var index_1 = require("./util/index");
 var self_1 = require("./util/self");
+var isNil = index_1.default.isNil;
 var self = self_1.getSelf();
-if (index_1.isNil(self))
+if (isNil(self))
     throw new Error('Cannot start system, cannot resolve self');
 var conqurSystem = self._conqurInners = self._conqurInners || {
     processes: {},
@@ -21,7 +22,7 @@ var registerProcess = function (pid, process) {
     conqurSystem.processes[pid] = process;
 };
 var isProcess = function (pid) {
-    return !index_1.isNil(conqurSystem.processes[pid]);
+    return !isNil(conqurSystem.processes[pid]);
 };
 var queueMessage = function (pid, mid, message) {
     conqurSystem.messageQueue.push({ pid: pid, message: message, mid: mid });
