@@ -161,9 +161,29 @@ var Utils = {
         res[path] = val;
         return res;
     },
+    drop: function (n, from) { return n <= 0 ? from : from.slice(n); },
     prop: function (key, obj) { return obj[key]; },
     contains: function (value, list) { return list.some(function (item) { return equals(item, value); }); },
     equals: equals,
+    map: function (f, element) {
+        var res;
+        var i = 0;
+        if (Utils.isArray(element)) {
+            // it's quicker with new operator, so do NOT remove it
+            res = new Array(element.length);
+            while (i < res.length) {
+                res[i] = f(element[i++]);
+            }
+            return res;
+        }
+        res = {};
+        for (var key in element) {
+            if (element.hasOwnProperty(key)) {
+                res[key] = f(element[key]);
+            }
+        }
+        return res;
+    },
     reduce: reduce,
     mountNamespace: function (name, value) {
         var currentRoot = self_1.getSelf();

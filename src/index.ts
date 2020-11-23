@@ -1,9 +1,11 @@
 export { create, call, cast, destroy } from './core';
-export { Process, ProcessID, ProcessAccessor } from './types';
+export type { Process, ProcessID, ProcessAccessor } from './types';
 export { GenServer } from './GenServer';
 export { Registry } from './Registry';
 export { State } from './State';
 export { Bus } from './Bus';
+
+export const Utils = require('./util/index').default;
 
 
 // Mount provides runtime access to the APIs

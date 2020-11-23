@@ -77,13 +77,14 @@ var getProcess = function (pid) {
  * 2. Registers the process with the conqer System
  * @returns the process id
  */
-exports.create = function (process) {
+var create = function (process) {
     var result = conqurSystem.pidCounter++;
     process.self = function () { return result; };
     registerProcess(result, process);
     return result;
 };
-exports.destroy = function (pid) {
+exports.create = create;
+var destroy = function (pid) {
     if (isProcess(pid)) {
         delete conqurSystem.processes[pid];
     }
@@ -91,7 +92,8 @@ exports.destroy = function (pid) {
         throw new Error("Cannot destroy a non-existent process: " + pid);
     }
 };
-exports.cast = function (pid, message) {
+exports.destroy = destroy;
+var cast = function (pid, message) {
     if (!isProcess(pid)) {
         throw new Error("Cannot cast a message to a non-existent process: " + pid);
     }
@@ -100,9 +102,11 @@ exports.cast = function (pid, message) {
     setasap_1.setAsap(processEventQueue);
     return mid;
 };
-exports.call = function (pid, message) {
+exports.cast = cast;
+var call = function (pid, message) {
     if (!isProcess(pid))
         throw new Error("Cannot call a non-existent process: " + pid);
     var process = getProcess(pid);
     return process.handleCall(message);
 };
+exports.call = call;

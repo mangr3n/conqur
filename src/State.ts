@@ -8,6 +8,9 @@ const { isNil } = Utils;
 
 const correctIndex = (index) => isNaN(parseInt(index)) ? index : parseInt(index);
 
+const isObjectIndex = (index) => isNaN(parseInt(index));
+const isArrayIndex = (index) => !isObjectIndex(index);
+
 const assignNestedValue = (remainingPath, value, currentTarget) => {
   if (remainingPath.length == 0) {
     return value;

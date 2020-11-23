@@ -38,7 +38,7 @@ var queueMicrotask = (function () {
 var setImmediate = self.setImmediate;
 var lastTimeToEventLoop = null;
 // let countToTaskQueue = 0;
-exports.setAsap = function (callback) {
+var setAsap = function (callback) {
     if (lastTimeToEventLoop == null) {
         lastTimeToEventLoop = Date.now();
     }
@@ -49,3 +49,4 @@ exports.setAsap = function (callback) {
     }
     queueMicrotask(callback);
 };
+exports.setAsap = setAsap;

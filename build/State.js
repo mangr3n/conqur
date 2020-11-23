@@ -8,6 +8,8 @@ var Registry_1 = require("./Registry");
 var util_1 = require("./util");
 var isNil = util_1.default.isNil;
 var correctIndex = function (index) { return isNaN(parseInt(index)) ? index : parseInt(index); };
+var isObjectIndex = function (index) { return isNaN(parseInt(index)); };
+var isArrayIndex = function (index) { return !isObjectIndex(index); };
 var assignNestedValue = function (remainingPath, value, currentTarget) {
     if (remainingPath.length == 0) {
         return value;
