@@ -151,9 +151,11 @@ const Utils = {
     res[path] = val;
     return res;
   },
+  drop: (n, from) => n <= 0 ? from : from.slice(n),
   prop: (key, obj) => obj[key],
   contains: (value, list) => list.some(item => equals(item, value)),
   equals,
+  map,
   reduce,
   mountNamespace: (name, value) => {
     let currentRoot = getSelf()
