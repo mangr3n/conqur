@@ -17,7 +17,9 @@
     "erlang",
     "actor",
     "process",
-    "async"
+    "async",
+    "reactive",
+    "eventbus"
   ],
   "author": "David Boyer",
   "license": "MIT",
@@ -27,7 +29,6 @@
   "homepage": "https://github.com/mangr3n/conqur#readme",
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "nanoutils": "^0.1.2",
     "setasap": "^2.0.1",
     "setimmediate": "^1.0.5"
   },
