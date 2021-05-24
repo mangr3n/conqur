@@ -55,16 +55,14 @@ const registerError = (errorPacket) => {
   conqurSystem.errors.byProcessId[pid].push(errorPacket);
 };
 
+// If the process does not exist, the message gets dropped.
 const processEventQueue = () => {
   if (!hasMessages()) return;
   const { pid, message, mid } = getNextMessage();
-  if (!isProcess(pid)) {
-    throw new Error(`Cannot handle a queued message for a non-existent process: ${pid}`);
-  }
-  const process = getProcess(pid);
   try {
-    process.handleCast(message);
+    getProcess(pid).handleCast(message);
   } catch (error) {
+    // This is not good, because the event queue doesn't get scheduled to run again to completion...
     registerError({ message, mid, pid, error });
     throw error;
   }

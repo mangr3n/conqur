@@ -50,18 +50,16 @@ var registerError = function (errorPacket) {
     }
     conqurSystem.errors.byProcessId[pid].push(errorPacket);
 };
+// If the process does not exist, the message gets dropped.
 var processEventQueue = function () {
     if (!hasMessages())
         return;
     var _a = getNextMessage(), pid = _a.pid, message = _a.message, mid = _a.mid;
-    if (!isProcess(pid)) {
-        throw new Error("Cannot handle a queued message for a non-existent process: " + pid);
-    }
-    var process = getProcess(pid);
     try {
-        process.handleCast(message);
+        getProcess(pid).handleCast(message);
     }
     catch (error) {
+        // This is not good, because the event queue doesn't get scheduled to run again to completion...
         registerError({ message: message, mid: mid, pid: pid, error: error });
         throw error;
     }
