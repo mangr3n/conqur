@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var self_1 = require("./self");
+import { getSelf } from "./self";
 var filterArr = function (cb, arr) {
     var res = [];
     for (var i = 0; i < arr.length; i++)
@@ -186,7 +184,7 @@ var Utils = {
     },
     reduce: reduce,
     mountNamespace: function (name, value) {
-        var currentRoot = self_1.getSelf();
+        var currentRoot = getSelf();
         var nameParts = name.split('.');
         while (nameParts.length > 0) {
             var part = nameParts.shift();
@@ -202,4 +200,4 @@ var Utils = {
         }
     }
 };
-exports.default = Utils;
+export default Utils;

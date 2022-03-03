@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.State = void 0;
-var core_1 = require("./core");
-var GenServer_1 = require("./GenServer");
-var Bus_1 = require("./Bus");
-var Registry_1 = require("./Registry");
-var util_1 = require("./util");
-var isNil = util_1.default.isNil;
+import { call } from './core';
+import { GenServer } from './GenServer';
+import { Bus } from './Bus';
+import { Registry } from './Registry';
+import Utils from './util';
+var isNil = Utils.isNil;
 var correctIndex = function (index) { return isNaN(parseInt(index)) ? index : parseInt(index); };
 var isObjectIndex = function (index) { return isNaN(parseInt(index)); };
 var isArrayIndex = function (index) { return !isObjectIndex(index); };
@@ -50,10 +47,10 @@ var getNestedValue = function (remainingPath, currentTarget) {
     }
 };
 var getState = function (scope, busName) {
-    var busApi = Bus_1.Bus.getBus(busName);
+    var busApi = Bus.getBus(busName);
     var registryName = "State[" + scope + "]";
-    if (isNil(Registry_1.Registry.lookup(registryName))) {
-        var _processID = GenServer_1.GenServer({
+    if (isNil(Registry.lookup(registryName))) {
+        var _processID = GenServer({
             name: registryName,
             initialState: {},
             castHandlers: {
@@ -88,20 +85,20 @@ var getState = function (scope, busName) {
                 }
             }
         });
-        Registry_1.Registry.create(_processID, registryName);
+        Registry.create(_processID, registryName);
     }
     return {
         getState: getState,
         set: function (name, value) {
-            core_1.call(Registry_1.Registry.lookup(registryName), { type: 'set', name: name, value: value });
+            call(Registry.lookup(registryName), { type: 'set', name: name, value: value });
         },
         unset: function (name) {
-            core_1.call(Registry_1.Registry.lookup(registryName), { type: 'unset', name: name });
+            call(Registry.lookup(registryName), { type: 'unset', name: name });
         },
         get: function (name) {
             if (name === void 0) { name = null; }
-            return core_1.call(Registry_1.Registry.lookup(registryName), { type: 'get', name: name });
+            return call(Registry.lookup(registryName), { type: 'get', name: name });
         }
     };
 };
-exports.State = getState('global', 'mainBus');
+export var State = getState('global', 'mainBus');

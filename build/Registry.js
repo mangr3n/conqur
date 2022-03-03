@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Registry = void 0;
-var core_1 = require("./core");
-var GenServer_1 = require("./GenServer");
-var self_1 = require("./util/self");
-var _self = self_1.getSelf();
+import { call } from './core';
+import { GenServer } from './GenServer';
+import { getSelf } from './util/self';
+var _self = getSelf();
 if (!_self.hasOwnProperty('_registry')) {
-    _self._registry = GenServer_1.GenServer({
+    _self._registry = GenServer({
         name: 'Registry',
         initialState: {
             processMap: {}
@@ -31,11 +28,11 @@ if (!_self.hasOwnProperty('_registry')) {
         }
     });
 }
-exports.Registry = {
+export var Registry = {
     create: function (process, name) {
-        return core_1.call(_self._registry, { type: 'create', process: process, name: name });
+        return call(_self._registry, { type: 'create', process: process, name: name });
     },
     lookup: function (name) {
-        return core_1.call(_self._registry, { type: 'lookup', name: name });
+        return call(_self._registry, { type: 'lookup', name: name });
     }
 };

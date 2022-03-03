@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.call = exports.cast = exports.destroy = exports.create = void 0;
-var setasap_1 = require("./util/setasap");
-var index_1 = require("./util/index");
-var self_1 = require("./util/self");
-var isNil = index_1.default.isNil;
-var self = self_1.getSelf();
+import { setAsap } from "./util/setasap";
+import Utils from './util/index';
+import { getSelf } from './util/self';
+var isNil = Utils.isNil;
+var self = getSelf();
 if (isNil(self))
     throw new Error('Cannot start system, cannot resolve self');
 var conqurSystem = self._conqurInners = self._conqurInners || {
@@ -38,7 +35,7 @@ var getNextMessage = function () {
         conqurSystem.messageQueueIndex = 0;
     }
     else {
-        setasap_1.setAsap(processEventQueue);
+        setAsap(processEventQueue);
     }
     return message;
 };
@@ -75,14 +72,13 @@ var getProcess = function (pid) {
  * 2. Registers the process with the conqer System
  * @returns the process id
  */
-var create = function (process) {
+export var create = function (process) {
     var result = conqurSystem.pidCounter++;
     process.self = function () { return result; };
     registerProcess(result, process);
     return result;
 };
-exports.create = create;
-var destroy = function (pid) {
+export var destroy = function (pid) {
     if (isProcess(pid)) {
         delete conqurSystem.processes[pid];
     }
@@ -90,21 +86,18 @@ var destroy = function (pid) {
         throw new Error("Cannot destroy a non-existent process: " + pid);
     }
 };
-exports.destroy = destroy;
-var cast = function (pid, message) {
+export var cast = function (pid, message) {
     if (!isProcess(pid)) {
         throw new Error("Cannot cast a message to a non-existent process: " + pid);
     }
     var mid = conqurSystem.midCounter++;
     queueMessage(pid, mid, message);
-    setasap_1.setAsap(processEventQueue);
+    setAsap(processEventQueue);
     return mid;
 };
-exports.cast = cast;
-var call = function (pid, message) {
+export var call = function (pid, message) {
     if (!isProcess(pid))
         throw new Error("Cannot call a non-existent process: " + pid);
     var process = getProcess(pid);
     return process.handleCall(message);
 };
-exports.call = call;

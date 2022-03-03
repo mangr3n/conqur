@@ -1,11 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.setAsap = void 0;
+// declare var require: (string) => any;
 // Schedules work off the stack
 // It will push to the microtask queue (processed first after stack)
 // Or if a certain amount of time has passed, it will push to the event loop
 // This allows eventhandlers and renderering to fire.
-require('setimmediate');
+import 'setimmediate';
 var self = require('./self').getSelf();
 var queueMicrotask = (function () {
     if (self.queueMicrotask !== undefined) {
@@ -38,7 +36,7 @@ var queueMicrotask = (function () {
 var setImmediate = self.setImmediate;
 var lastTimeToEventLoop = null;
 // let countToTaskQueue = 0;
-var setAsap = function (callback) {
+export var setAsap = function (callback) {
     if (lastTimeToEventLoop == null) {
         lastTimeToEventLoop = Date.now();
     }
@@ -49,4 +47,3 @@ var setAsap = function (callback) {
     }
     queueMicrotask(callback);
 };
-exports.setAsap = setAsap;

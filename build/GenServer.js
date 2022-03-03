@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GenServer = void 0;
-var util_1 = require("./util");
-var core_1 = require("./core");
-var isNil = util_1.default.isNil;
+import Utils from "./util";
+import { create } from './core';
+var isNil = Utils.isNil;
 ;
-var GenServer = function (_a) {
+export var GenServer = function (_a) {
     var name = _a.name, castHandlers = _a.castHandlers, callHandlers = _a.callHandlers, initialState = _a.initialState;
     var state = initialState;
     var me = null;
@@ -37,7 +34,6 @@ var GenServer = function (_a) {
         },
         handleCall: handleCall
     };
-    me = core_1.create(processDef);
+    me = create(processDef);
     return me;
 };
-exports.GenServer = GenServer;
