@@ -4,7 +4,8 @@
 // Or if a certain amount of time has passed, it will push to the event loop
 // This allows eventhandlers and renderering to fire.
 import 'setimmediate';
-var self = require('./self').getSelf();
+import { getSelf } from './self';
+var self = getSelf();
 var queueMicrotask = (function () {
     if (self.queueMicrotask !== undefined) {
         return self.queueMicrotask;

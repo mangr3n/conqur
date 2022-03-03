@@ -1,14 +1,11 @@
-// declare var require: (string) => any;
 // Schedules work off the stack
 // It will push to the microtask queue (processed first after stack)
 // Or if a certain amount of time has passed, it will push to the event loop
 // This allows eventhandlers and renderering to fire.
 import 'setimmediate';
 
-
-const self = require('./self').getSelf();
-
-
+import { getSelf } from './self';
+const self = getSelf();
 
 const queueMicrotask = (() => {
   if (self.queueMicrotask !== undefined) {

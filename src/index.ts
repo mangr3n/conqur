@@ -23,15 +23,13 @@ export const Bus = _Bus;
 
 let result = null;
 
-export const mount = () => {
-  Utils.mountNamespace('conqur', result);
-};
 // Mount provides runtime access to the APIs
 // in the Browser Console or in the Node shell.
 // This is purely for debugging purposes, not for
 // creating code.
-// To enable simply require('conqur').mount();
-//
+export const mount = () => {
+  Utils.mountNamespace('conqur', result);
+};
 result = {
   create, call, cast, destroy, GenServer, Registry, State, Bus, Utils, mount
 };
