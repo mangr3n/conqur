@@ -21,7 +21,7 @@ export const Registry = _Registry;
 export const State = _State;
 export const Bus = _Bus;
 
-declare let result;
+let result = null;
 
 export const mount = () => {
   Utils.mountNamespace('conqur', result);

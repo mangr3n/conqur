@@ -13,6 +13,7 @@ export var GenServer = _GenServer;
 export var Registry = _Registry;
 export var State = _State;
 export var Bus = _Bus;
+var result = null;
 export var mount = function () {
     Utils.mountNamespace('conqur', result);
 };
