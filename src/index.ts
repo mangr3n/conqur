@@ -21,20 +21,19 @@ export const Registry = _Registry;
 export const State = _State;
 export const Bus = _Bus;
 
+declare let result;
 
-declare let mount: () => void;
+export const mount = () => {
+  Utils.mountNamespace('conqur', result);
+};
 // Mount provides runtime access to the APIs
 // in the Browser Console or in the Node shell.
 // This is purely for debugging purposes, not for
 // creating code.
 // To enable simply require('conqur').mount();
 //
-const result = {
+result = {
   create, call, cast, destroy, GenServer, Registry, State, Bus, Utils, mount
-};
-
-mount = () => {
-  Utils.mountNamespace('conqur',result);
 };
 
 export default result;
