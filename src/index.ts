@@ -4,7 +4,9 @@ import { GenServer } from './GenServer';
 import { Registry } from './Registry';
 import { State } from './State';
 import { Bus } from './Bus';
-import Utils from './util/index';
+import _Utils from './util/index';
+
+export const Utils = _Utils;
 
 declare let mount: () => void;
 // Mount provides runtime access to the APIs

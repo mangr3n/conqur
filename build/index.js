@@ -3,7 +3,8 @@ import { GenServer } from './GenServer';
 import { Registry } from './Registry';
 import { State } from './State';
 import { Bus } from './Bus';
-import Utils from './util/index';
+import _Utils from './util/index';
+export var Utils = _Utils;
 // Mount provides runtime access to the APIs
 // in the Browser Console or in the Node shell.
 // This is purely for debugging purposes, not for
