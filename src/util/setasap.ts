@@ -7,41 +7,45 @@ import 'setimmediate';
 import { getSelf } from './self';
 const self = getSelf();
 
+type Callback = () => void;
+
 const queueMicrotask = (() => {
   if (self.queueMicrotask !== undefined) {
     return self.queueMicrotask;
   } else if (self.process.nextTick !== undefined) {
     return self.process.nextTick;
   } else {
-    const unusedNodes = [];
-    return (callback) => {
-      let hiddenDiv = null;
+    const unusedNodes: HTMLElement[] = [];
+    return (callback: Callback) => {
+      let hiddenDiv: HTMLElement | null | undefined;
       if (unusedNodes.length !== 0) {
         hiddenDiv = unusedNodes.pop();
       } else {
         hiddenDiv = document.createElement('div');
       }
-      const obs = new MutationObserver(function () {
+      const obs = new MutationObserver(() => {
         callback();
         obs.disconnect();
-        unusedNodes.push(hiddenDiv);
+        if (hiddenDiv !== null) {
+          unusedNodes.push(hiddenDiv as HTMLElement);
+        }
         hiddenDiv = null;
       });
-      obs.observe(hiddenDiv, { attributes: true });
-      hiddenDiv.setAttribute('i', '1');
+      obs.observe(hiddenDiv as HTMLElement, { attributes: true });
+      (hiddenDiv as HTMLElement).setAttribute('i', '1');
     };
   }
 })();
 
 const setImmediate = self.setImmediate;
 
-let lastTimeToEventLoop = null;
+let lastTimeToEventLoop: number | null = null;
 // let countToTaskQueue = 0;
-export const setAsap = (callback) => {
+export const setAsap = (callback: Callback) => {
   if (lastTimeToEventLoop == null) {
     lastTimeToEventLoop = Date.now();
   }
-  if ((Date.now() - lastTimeToEventLoop) > 20) {
+  if (Date.now() - lastTimeToEventLoop > 20) {
     setImmediate(callback);
     lastTimeToEventLoop = null;
     return;

@@ -6,17 +6,21 @@ import Utils from './util';
 
 const { isNil } = Utils;
 
-const correctIndex = (index) => isNaN(parseInt(index)) ? index : parseInt(index);
+const correctIndex = (index: any) => (isNaN(parseInt(index)) ? index : parseInt(index));
 
-const isObjectIndex = (index) => isNaN(parseInt(index));
-const isArrayIndex = (index) => !isObjectIndex(index);
+const isObjectIndex = (index: any) => isNaN(parseInt(index));
+const isArrayIndex = (index: any) => !isObjectIndex(index);
 
-const assignNestedValue = (remainingPath, value, currentTarget) => {
-  if (remainingPath.length == 0) {
+const assignNestedValue: (path: string[], value: any, target: any) => any = (
+  remainingPath: string[],
+  value: any,
+  currentTarget: any,
+) => {
+  if (remainingPath.length === 0) {
     return value;
   } else {
     const index = correctIndex(remainingPath.shift());
-    if (remainingPath.length == 0) {
+    if (remainingPath.length === 0) {
       currentTarget[index] = value;
       return currentTarget;
     } else {
@@ -25,21 +29,21 @@ const assignNestedValue = (remainingPath, value, currentTarget) => {
   }
 };
 
-const deleteItemAt = (remainingPath, currentTarget) => {
+const deleteItemAt = (remainingPath: string[], currentTarget: any) => {
   if (currentTarget === undefined) return;
-  if (remainingPath.length == 0) return;
-  if (remainingPath.length == 1) {
+  if (remainingPath.length === 0) return;
+  if (remainingPath.length === 1) {
     delete currentTarget[remainingPath[0]];
     return;
   }
   const index = correctIndex(remainingPath.shift());
-  deleteItemAt(remainingPath,currentTarget[index]);
+  deleteItemAt(remainingPath, currentTarget[index]);
   return;
 };
 
-const getNestedValue = (remainingPath, currentTarget) => {
+const getNestedValue: (x: string[], target: any) => any = (remainingPath: string[], currentTarget: any) => {
   if (currentTarget === undefined) return undefined;
-  if (remainingPath.length == 0) {
+  if (remainingPath.length === 0) {
     return currentTarget;
   } else {
     const index = correctIndex(remainingPath.shift());
@@ -47,8 +51,7 @@ const getNestedValue = (remainingPath, currentTarget) => {
   }
 };
 
-const getState = (scope, busName) => {
-
+const getState = (scope: string, busName: string) => {
   const busApi = Bus.getBus(busName);
 
   const registryName = `State[${scope}]`;
@@ -73,35 +76,35 @@ const getState = (scope, busName) => {
           const { name } = msg;
           const oldValue = getNestedValue(name.split('.'), state);
           deleteItemAt(name.split('.'), state);
-          busApi.sendEvent({ type: `${name}:removed`, oldValue});
+          busApi.sendEvent({ type: `${name}:removed`, oldValue });
           return;
         },
         get: (self, state, msg) => {
           const { name } = msg;
-          if (isNil(name) || undefined === name || name == '' || name == '.') {
+          if (isNil(name) || undefined === name || name === '' || name === '.') {
             return getNestedValue([], state);
           } else {
             const path = name.split('.');
             return getNestedValue(path, state);
           }
-        }
-      }
+        },
+      },
     });
-    Registry.create(_processID,registryName);
+    Registry.create(_processID, registryName);
   }
 
-return {
-  getState,
-  set: (name, value) => {
-    call(Registry.lookup(registryName), { type: 'set', name, value });
-  },
-  unset: (name) => {
-    call(Registry.lookup(registryName), { type: 'unset', name });
-  },
-  get: (name: string = null) => {
-    return call(Registry.lookup(registryName), { type: 'get', name });
-  }
-};
+  return {
+    getState,
+    set: (name: string, value: any) => {
+      call(Registry.lookup(registryName), { type: 'set', name, value });
+    },
+    unset: (name: string) => {
+      call(Registry.lookup(registryName), { type: 'unset', name });
+    },
+    get: (name: string | null = null) => {
+      return call(Registry.lookup(registryName), { type: 'get', name });
+    },
+  };
 };
 
 export const State = getState('global', 'mainBus');

@@ -3,10 +3,12 @@
     "moduleResolution": "node",
     "isolatedModules": false,
     "suppressImplicitAnyIndexErrors": true,
-    "module": "es6",
+    "declaration": true,
+    "module": "commonjs",
     "lib": ["es2015","dom","es5"],
     "target": "ES5",
-    "outDir": "./build"
+    "outDir": "./lib",
+    "strict": true
   },
   "formatCodeOptions": {
     "indentSize": 2,

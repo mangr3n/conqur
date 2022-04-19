@@ -3,7 +3,7 @@ import { Registry } from './Registry';
 import { GenServer } from './GenServer';
 import { ProcessID } from './types';
 
-declare var BusFn;
+declare var BusFn: (name: string) => BusAPI;
 
 type HandlerID = number;
 type EventType = string;
@@ -18,29 +18,26 @@ type HandlerFn = (event: BusEvent) => boolean;
 interface HandlerRegistration {
   event: EventType;
   handler: HandlerFn;
-  options: Object;
+  options: object;
 }
 
-interface BusAPI {
+export interface BusAPI {
   getBus: BusFn;
-  initialize: ([HandlerRegistration]) => void;
+  initialize: (x: [HandlerRegistration]) => void;
   sendEvent: (event: BusEvent) => void;
-  handle: (event: EventType, handler: HandlerFn, options?: Object) => HandlerID;
+  handle: (event: EventType, handler: HandlerFn, options?: object) => HandlerID;
   handleOnce: (event: EventType, handler: HandlerFn) => HandlerID;
   unhandle: (id: HandlerID) => void;
   debug: () => boolean;
 }
 
-type BusFn = (string) => BusAPI;
+type BusFn = (arg0: string) => BusAPI;
 
-
-let getBus = null;
-getBus = (name) => {
+const getBus: BusFn = (name) => {
   const _registryName = `Bus[${name}]`;
   if (Registry.lookup(_registryName) == null) {
-    let bus = null;
     const debugLabel = () => `${_registryName}/[pid: ${bus}]`;
-    bus = GenServer({
+    const bus = GenServer({
       initialState: {
         _handlerId: 0,
         idMap: {},
@@ -49,7 +46,7 @@ getBus = (name) => {
         _queueInProcess: [],
         _notHandledQueue: [],
         _inProcess: false,
-        _pending: false
+        _pending: false,
       },
       name: _registryName,
       castHandlers: {
@@ -58,8 +55,8 @@ getBus = (name) => {
             console.log(`${debugLabel()}/init`, { state, msg });
           }
           const { handlers } = msg;
-          for (let idx = 0; idx < handlers.length; idx++) {
-            const { event, options, handler } = handlers[idx];
+          for (const handlerItem of handlers) {
+            const { event, options, handler } = handlerItem;
             const handlerId = call(self(), { type: 'registerHandler', options, event, handler });
           }
           return state;
@@ -92,9 +89,9 @@ getBus = (name) => {
                 }
               } catch (error) {
                 if (options.once) {
-                  call(self(), {type: 'removeHandler', id});
+                  call(self(), { type: 'removeHandler', id });
                 }
-                call(self(), {type: 'sendEvent', event: {type:'error',error,source:handleEntry}});
+                call(self(), { type: 'sendEvent', event: { type: 'error', error, source: handleEntry } });
               }
             }
             while (state._notHandledQueue.length > 0) {
@@ -108,7 +105,7 @@ getBus = (name) => {
             }
           }
           return state;
-        }
+        },
       },
       callHandlers: {
         debug: (self, state, msg) => {
@@ -126,11 +123,11 @@ getBus = (name) => {
             console.log(`${debugLabel()}/registerHandler`, { state, msg });
           }
           const { event } = msg;
-          let id = state._handlerId++;
-          delete msg['type'];
+          const id = state._handlerId++;
+          // delete msg['type'];
           const handlerEntry = {
             ...msg,
-            id
+            id,
           };
           state.idMap[id] = handlerEntry;
           if (!state.handlers.hasOwnProperty(event)) {
@@ -143,8 +140,8 @@ getBus = (name) => {
           if (!!state.debug) {
             console.log(`${debugLabel()}/sendEvent`, { state, msg });
           }
-          if (!! state.logEvents) {
-            console.log(`${debugLabel()}/event: `,msg.event);
+          if (!!state.logEvents) {
+            console.log(`${debugLabel()}/event: `, msg.event);
           }
           const { event } = msg;
           const { type } = event;
@@ -152,8 +149,8 @@ getBus = (name) => {
             if (!!state.debug) console.log(`${debugLabel()} has no handlers for '${type}'`);
           } else {
             const handlers = state.handlers[type];
-            for (let idx = 0; idx < handlers.length; idx++) {
-              const handlerEntry = handlers[idx];
+            for (const handlerItem of handlers) {
+              const handlerEntry = handlerItem;
               state.handleQueue.push({ handler: handlerEntry, event, tries: 0 });
             }
           }
@@ -173,16 +170,15 @@ getBus = (name) => {
             const event = state.idMap[id].event;
             const handlers = state.handlers[event];
             const newHandlers = [];
-            for (let idx = 0; idx < handlers.length; idx++) {
-              const entry = handlers[idx];
-              if (id == entry.id) continue;
+            for (const entry of handlers) {
+              if (id === entry.id) continue;
               newHandlers.push(entry);
             }
             state.handlers[event] = newHandlers;
             delete state.idMap[id];
           }
-        }
-      }
+        },
+      },
     });
     Registry.create(bus, _registryName);
   }
@@ -204,12 +200,12 @@ getBus = (name) => {
     unhandle: (handlerId) => {
       return call(Registry.lookup(_registryName), { type: 'removeHandler', id: handlerId });
     },
-    debug: (turnOn=true) => {
+    debug: (turnOn = true) => {
       return call(Registry.lookup(_registryName), { type: 'debug', turnOn });
-    }, 
-    logEvents: (turnOn=true) => {
-      return call(Registry.lookup(_registryName), { type: 'logEvents', turnOn});
-    }
+    },
+    logEvents: (turnOn = true) => {
+      return call(Registry.lookup(_registryName), { type: 'logEvents', turnOn });
+    },
   };
 };
 

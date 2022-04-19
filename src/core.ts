@@ -1,4 +1,4 @@
-import { setAsap } from "./util/setasap";
+import { setAsap } from './util/setasap';
 import Utils from './util/index';
 import { getSelf } from './util/self';
 import { Process, ProcessID } from './types';
@@ -7,16 +7,17 @@ const self = getSelf();
 
 if (isNil(self)) throw new Error('Cannot start system, cannot resolve self');
 
-const conqurSystem = (self as any)._conqurInners = (self as any)._conqurInners || {
+const conqurSystem = ((self as any)._conqurInners = (self as any)._conqurInners || {
   processes: {},
   messageQueue: [],
   messageQueueIndex: 0,
   errors: {
-    byMessageId: {}, byProcessId: {}
+    byMessageId: {},
+    byProcessId: {},
   },
   pidCounter: 1,
-  midCounter: 1
-};
+  midCounter: 1,
+});
 
 const registerProcess = (pid: ProcessID, process: Process) => {
   conqurSystem.processes[pid] = process;
@@ -24,9 +25,9 @@ const registerProcess = (pid: ProcessID, process: Process) => {
 
 const isProcess = (pid: ProcessID) => {
   return !isNil(conqurSystem.processes[pid]);
-}
+};
 
-const queueMessage = (pid: ProcessID, mid, message) => {
+const queueMessage = (pid: ProcessID, mid: number, message: any) => {
   conqurSystem.messageQueue.push({ pid, message, mid });
 };
 
@@ -37,16 +38,16 @@ const hasMessages = () => {
 const getNextMessage = () => {
   const message = conqurSystem.messageQueue[conqurSystem.messageQueueIndex];
   conqurSystem.messageQueueIndex++;
-  if (conqurSystem.messageQueueIndex == conqurSystem.messageQueue.length) {
+  if (conqurSystem.messageQueueIndex === conqurSystem.messageQueue.length) {
     conqurSystem.messageQueue = [];
     conqurSystem.messageQueueIndex = 0;
   } else {
-    setAsap(processEventQueue)
+    setAsap(processEventQueue);
   }
   return message;
-}
+};
 
-const registerError = (errorPacket) => {
+const registerError = (errorPacket: any) => {
   const { mid, pid } = errorPacket;
   conqurSystem.errors.byMessageId[mid] = errorPacket;
   if (conqurSystem.errors.byProcessId[pid] == null) {
@@ -68,16 +69,15 @@ const processEventQueue = () => {
   }
 };
 
-const getProcess = (pid) => {
+const getProcess = (pid: ProcessID) => {
   if (!isProcess(pid)) {
     throw new Error(`Cannot get a process that does not exist: ${pid}`);
   }
   return conqurSystem.processes[pid];
 };
 
-
 /**
- * 1. Creates a process from the process definition, 
+ * 1. Creates a process from the process definition,
  * 2. Registers the process with the conqer System
  * @returns the process id
  */
@@ -106,7 +106,7 @@ export const cast = (pid: ProcessID, message: any) => {
   return mid;
 };
 
-export const call = (pid, message) => {
+export const call = (pid: number, message: any) => {
   if (!isProcess(pid)) throw new Error(`Cannot call a non-existent process: ${pid}`);
   const process = getProcess(pid);
   return process.handleCall(message);

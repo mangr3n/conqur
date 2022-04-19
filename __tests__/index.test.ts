@@ -1,4 +1,5 @@
 import * as test from 'tape';
+import { Message } from '../src/GenServer';
 import { GenServer, create, cast, call, destroy } from '../src/index';
 
 test('expect create to return a process id', (t) => {
@@ -18,7 +19,7 @@ test('expect cast to invoke handleCast', (t) => {
   const processDef = { 
     name: 'TestCast',
     self: () => processId, 
-    handleCast: (msg) => {
+    handleCast: (msg:Message) => {
       t.equal(msg,1);
       t.end();
     }
@@ -32,7 +33,7 @@ test('expect call to invoke handleCall', t => {
     name: 'TestCall',
     self: () => processId,
     handleCast: () => null,
-    handleCall: (msg) => msg
+    handleCall: (msg:any) => msg
   };
   const processId = create(processDef);
   t.equal(call(processId,1),1);
