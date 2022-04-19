@@ -1,6 +1,6 @@
 {
   "name": "conqur",
-  "version": "0.5.5",
+  "version": "1.0.0",
   "description": "Framework for creating Processes with Erlang/Elixir message passing semanticsx",
   "main": "lib/index.js",
   "scripts": {
@@ -10,7 +10,9 @@
     "build": "tsc",
     "clean": "rm -rf build"
   },
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mangr3n/conqur.git"
